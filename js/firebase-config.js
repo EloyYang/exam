@@ -39,3 +39,13 @@ window.ADS = {
   client: '',
   slots: { home: '', list: '', result: '', review: '', map: '' },
 };
+
+/*
+ * 이용 기록(Google 애널리틱스 4) — 보는 법은 ANALYTICS.md
+ *   measurementId: Firebase 콘솔 › 프로젝트 설정 › 내 앱 의 측정 ID (G-로 시작)
+ *   enabled: false 로 두면 아무것도 보내지 않는다
+ */
+window.ANALYTICS = {
+  enabled: true,
+  measurementId: 'G-FXS8VPXXJV',
+};

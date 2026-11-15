@@ -63,12 +63,13 @@ if (!cfg || !cfg.apiKey) {
 
   document.addEventListener('click', async (e) => {
     if (e.target.closest('.auth-in')) {
-      try { await A.signInWithPopup(auth, new A.GoogleAuthProvider()); }
+      try { await A.signInWithPopup(auth, new A.GoogleAuthProvider()); if (window.track) window.track('login', { method: 'google' }); }
       catch (err) { if (err && err.code !== 'auth/popup-closed-by-user') alert('로그인하지 못했어요: ' + (err.message || err)); }
       return;
     }
     if (e.target.closest('.auth-me')) { const m = document.querySelector('.auth-menu'); m.hidden = !m.hidden; return; }
     if (e.target.closest('.auth-out')) {
+      if (window.track) window.track('logout');
       await A.signOut(auth);
       S._forgetLocal(); // 계정 기록은 서버에 있으니 이 브라우저에서는 지운다
       try { localStorage.removeItem('userstore.uid'); } catch (err) { /* 무시 */ }
