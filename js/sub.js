@@ -65,12 +65,12 @@
     document.body.classList.add('pw-on');
     const price = `월 ${won(P.price || 5000)}`;
     g.innerHTML = `<div class="pw-box" role="dialog" aria-modal="true">
-      <p class="pw-mark">史</p>
+      <p class="pw-mark">✓</p>
       ${A.state === 'signed-out' ? `<h2>구글 계정으로 로그인해 주세요</h2>
         <p>처음 로그인하면 <b>${P.trialDays || 7}일 동안 무료</b>로 모든 기능을 쓸 수 있어요.<br>체험이 끝나면 ${price}으로 이용할 수 있어요.</p>
         <button type="button" class="pw-go" data-pw-login>Google 계정으로 시작하기</button>`
       : A.state === 'expired' ? `<h2>${A.paidUntil ? '구독 기간이 끝났어요' : '무료 체험이 끝났어요'}</h2>
-        <p>${price}으로 기출 풀기·오답 노트·지도 노트를 계속 이용할 수 있어요.${A.lastError ? `<br><small class="pw-err">최근 결제 실패: ${esc(A.lastError)}</small>` : ''}</p>
+        <p>${price}으로 기출 풀기·오답 노트·정리 노트를 계속 이용할 수 있어요.${A.lastError ? `<br><small class="pw-err">최근 결제 실패: ${esc(A.lastError)}</small>` : ''}</p>
         <a class="pw-go" href="subscribe.html">구독하기</a>`
       : `<h2>이용 정보를 확인하지 못했어요</h2><p><small class="pw-err">${esc(A.error)}</small></p><button type="button" class="pw-go" data-pw-retry>다시 시도</button>`}
       <a class="pw-home" href="index.html">처음 화면으로</a></div>`;
@@ -106,7 +106,7 @@
       storeId: P.storeId, channelKey,
       billingKeyMethod: method === 'card' ? 'CARD' : 'EASY_PAY',
       issueId: `bk-${u.uid.slice(0, 10)}-${Date.now()}`,
-      issueName: `시험 공부 노트 월 구독 (${won(P.price || 5000)})`,
+      issueName: `시험 준비 노트 월 구독 (${won(P.price || 5000)})`,
       customer: { customerId: u.uid, email: u.email || undefined, fullName: u.name || undefined },
       redirectUrl: back.toString(), // 모바일은 결제창에서 이 주소로 돌아온다
     });

@@ -60,7 +60,7 @@ function need(req) {
 async function charge(uid, b, reason) {
   const paymentId = `sub-${uid.slice(0, 10)}-${Date.now()}`;
   const amount = PRICE.value();
-  const orderName = `시험 공부 노트 월 구독 (${new Date().getFullYear()}.${new Date().getMonth() + 1})`;
+  const orderName = `시험 준비 노트 월 구독 (${new Date().getFullYear()}.${new Date().getMonth() + 1})`;
   await portone(`/payments/${encodeURIComponent(paymentId)}/billing-key`, {
     method: 'POST',
     body: JSON.stringify({ storeId: STORE_ID.value(), billingKey: b.billingKey, orderName, customer: { id: uid, email: b.email || undefined }, amount: { total: amount }, currency: 'KRW' }),

@@ -305,6 +305,7 @@
   });
   // 펼친 필터 목록은 바깥을 누르면 접는다
   document.addEventListener('click', (e) => {
+    if (!e.target.isConnected) return; // 칩을 눌러 화면이 다시 그려진 경우
     MAIN.querySelectorAll('details.f-multi[open]').forEach((d) => { if (!d.contains(e.target)) d.open = false; });
   });
   // 빈 곳을 눌러도 입력칸으로

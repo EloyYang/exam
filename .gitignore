@@ -6,3 +6,4 @@ functions/.env
 functions/.env.*
 *-firebase-adminsdk-*.json
 .firebase/
+__pycache__/

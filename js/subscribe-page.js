@@ -6,13 +6,15 @@
   let busy = '', msg = '';
   const price = () => window.Sub ? window.Sub.won(P.price || 5000) : `${P.price || 5000}원`;
 
+  // 구독이 꺼져 있는 동안(PAYWALL.enabled: false)에는 요금 안내를 보여 주지 않고 처음 화면으로 보낸다
+  if (!P.enabled) { location.replace('index.html'); return; }
+  const sub = document.getElementById('sub-price');
+  if (sub) sub.textContent = `${P.trialDays || 7}일 무료 체험 · 이후 월 ${Number(P.price || 5000).toLocaleString('ko-KR')}원`;
+
   function render() {
     const A = window.Access || { state: 'off' };
     const S = window.Sub;
-    if (A.state === 'off') {
-      box.innerHTML = `<section class="sub-card"><h2>지금은 무료로 열려 있어요</h2><p>구독 기능이 아직 켜지지 않았어요. 모든 기능을 자유롭게 쓸 수 있어요.</p><a class="pw-go" href="index.html">처음 화면으로</a></section>`;
-      return;
-    }
+    if (A.state === 'off') { location.replace('index.html'); return; }
     if (A.state === 'loading') { box.innerHTML = '<p class="qv-wait">구독 정보를 확인하는 중…</p>'; return; }
     if (A.state === 'signed-out') {
       box.innerHTML = `<section class="sub-card"><h2>구글 계정으로 로그인해 주세요</h2><p>처음 로그인하면 <b>${P.trialDays || 7}일 무료 체험</b>이 시작돼요. 체험 중에는 결제되지 않아요.</p><button type="button" class="pw-go" data-sub-login>Google 계정으로 시작하기</button></section>${plan()}`;

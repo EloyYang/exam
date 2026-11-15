@@ -1289,7 +1289,7 @@ body.pw-on { overflow: hidden; }
 .ad-slot.on { display: block; margin: 18px 0; padding: 6px 0 10px; border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); min-height: 90px; text-align: center; }
 .ad-label { display: block; margin-bottom: 4px; font-size: 10.5px; color: var(--muted); letter-spacing: .05em; }
 .ad-wrap { padding-top: 0; }
-.site-foot { padding-top: 0; font-size: 12.5px; color: var(--muted); text-align: center; } .site-foot a { color: var(--muted); }
+.site-foot { padding-top: 0; font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.7; } .site-foot a { color: var(--muted); }
 
 /* ───── 지텔프 ───── */
 .gt-page { --accent: #1f5f8b; --accent-soft: #dcebf5; }
@@ -1404,7 +1404,7 @@ body.pw-on { overflow: hidden; }
 }
 :root[data-theme="dark"] .gt-opts button.ans { background: #1d3a20; color: #a5d6a7; }
 :root[data-theme="dark"] .gt-opts button.miss { background: #3d1f1f; color: #ff8a80; }
-.gt-page main a:not(.gt-btn):not(.gt-card):not(.gt-set) { color: var(--accent); font-weight: 700; }
+.gt-page main a:not(.gt-btn):not(.gt-card):not(.gt-set):not(.gt-plancard) { color: var(--accent); font-weight: 700; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .gt-page :is(.gt-chips .chip.on, .gt-btn.main) { color: #0f1d27; } :root:not([data-theme="light"]) .gt-page .gt-chips .chip.on small { color: #0f1d27; } }
 :root[data-theme="dark"] .gt-page :is(.gt-chips .chip.on, .gt-btn.main) { color: #0f1d27; } :root[data-theme="dark"] .gt-page .gt-chips .chip.on small { color: #0f1d27; }
 .gt-chips[hidden] { display: none; }
@@ -1664,8 +1664,40 @@ body.pw-on { overflow: hidden; }
 .fv-filter .f-modes { margin: 6px 0; }
 .top-tools .f-modes { margin: 0; max-width: 320px; } .top-tools .f-modes button { font-size: 13px; padding: 6px 10px; }
 
-/* 타자 연습: 다중 선택 목록은 다른 필터를 밀어내지 않고 버튼 아래에 떠서 펼쳐진다 */
-.ty-page .f-multi[open] { flex-basis: auto; }
-.ty-page .f-multi-list { position: absolute; top: 100%; left: 0; z-index: 20; width: max-content; max-width: min(92vw, 380px); margin: 4px 0 0; box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
-.ty-page .f-filters { align-items: flex-start; }
+/* 다중 선택 필터(FILTER.multi) 공통: 목록은 다른 필터를 밀어내지 않고 버튼 아래에 떠서 펼쳐진다 */
+.f-multi[open] { flex-basis: auto; }
+.f-multi-list { position: absolute; top: 100%; left: 0; z-index: 20; width: max-content; max-width: min(92vw, 380px); margin: 4px 0 0; box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
+.f-filters { align-items: flex-start; }
 .ty-clues { margin: 6px 0 4px; padding-left: 20px; text-align: left; font-size: 14px; } .ty-clues li { margin: 1px 0; }
+/* 다중 선택 필터 공통: 세로 목록 + 항목 옆 체크 상자 (둥근 알약 모양 없음) */
+.f-multi-list { flex-direction: column; flex-wrap: nowrap; padding: 4px; gap: 0; min-width: 150px; }
+.f-multi-list .r-chips { flex-direction: column; flex-wrap: nowrap; gap: 0; width: 100%; }
+.f-multi-list .r-chips button { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--text); font-size: 13.5px; }
+.f-multi-list .r-chips button:hover { background: var(--surface-2); }
+.f-multi-list .r-chips button::before { content: ''; flex: none; width: 16px; height: 16px; box-sizing: border-box; border: 1.5px solid var(--muted); border-radius: 3px; background: var(--surface) center / 12px no-repeat; }
+.f-multi-list .r-chips button[aria-pressed="true"] { background: transparent; color: var(--text); font-weight: 700; }
+.f-multi-list .r-chips button[aria-pressed="true"]::before { border-color: var(--accent); background-color: var(--accent); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5l3 3 5-6' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.f-multi-list .r-chips button small { margin-left: auto; padding-left: 10px; color: var(--muted); font-size: 11.5px; font-weight: 400; }
+.f-multi-list .r-chips button[aria-pressed="true"] small { color: var(--muted); }
+
+/* ── 첫 화면: 소개 · 시험일 D-day ─────────────────────────── */
+.h-hero { margin-bottom: 14px; padding: 20px 18px; border-radius: var(--radius); background: #2f4f6f; color: #fff; }
+.h-hero h2 { margin: 0; font-size: 21px; font-weight: 900; line-height: 1.35; }
+.h-hero > p { margin: 4px 0 14px; font-size: 14px; color: rgba(255, 255, 255, .85); }
+.h-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; counter-reset: step; }
+.h-steps li { counter-increment: step; padding: 10px 12px; border-radius: 8px; background: rgba(255, 255, 255, .12); font-size: 12.5px; line-height: 1.45; }
+.h-steps b { display: block; font-size: 14.5px; }
+.h-steps b::before { content: counter(step) '. '; opacity: .7; }
+.h-steps span { color: rgba(255, 255, 255, .8); }
+@media (max-width: 600px) { .h-steps { grid-template-columns: minmax(0, 1fr); gap: 6px; } .h-steps li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 8px 12px; } .h-hero h2 { font-size: 19px; } }
+.h-dday { position: relative; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); font-size: 12.5px; cursor: pointer; }
+.h-dday b { color: var(--accent); font-size: 14px; font-weight: 900; }
+.h-dday.empty { border-style: dashed; background: none; color: var(--muted); font-weight: 700; }
+.h-dday.soon { border-color: var(--accent); background: var(--accent-soft); }
+.h-dday.past { color: var(--muted); }
+.h-dday input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; }
+.h-dday:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.h-noscript { padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+/* 개인정보처리방침·안내 글의 링크는 테마 색 (기본 파란색은 어두운 화면에서 안 보임) */
+.privacy a, .sub-plan a { color: var(--accent); }
+.privacy li { margin-bottom: 4px; }
