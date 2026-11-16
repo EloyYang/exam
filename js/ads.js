@@ -3,11 +3,14 @@
  *   페이지 곳곳의 <div class="ad-slot" data-ad="자리"> 에 광고를 넣는다.
  *   ADS.enabled 가 false 이거나 게시자 ID가 없으면 아무것도 불러오지 않고 자리도 보이지 않는다.
  *   문제를 푸는 화면에는 광고 자리를 두지 않는다.
+ *   ADS.pages 에 적힌 화면에서만 광고를 낸다 (영리 이용 허락을 확인하지 못한 기출 화면에는 내지 않으려는 것). 없으면 모든 화면.
  */
 (function () {
   const A = window.ADS || {};
   const on = !!(A.enabled && /^ca-pub-\d{10,}$/.test(A.client || ''));
   if (!on) return;
+  const page = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
+  if (Array.isArray(A.pages) && !A.pages.includes(page)) return;
   let loaded = false;
   function load() {
     if (loaded) return; loaded = true;

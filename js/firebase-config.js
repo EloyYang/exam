@@ -33,10 +33,13 @@ window.PAYWALL = {
  *   enabled: 애드센스 승인을 받은 뒤 true 로
  *   client : 애드센스 게시자 ID (ca-pub-로 시작하는 16자리)
  *   slots  : 광고 단위 ID (없으면 자동 광고 단위로 보여 줌)
+ *   pages  : 광고를 낼 화면 (파일 이름). 직접 만든 문제만 있는 지텔프부터 시작하고,
+ *            기출 문제의 영리 이용 허락을 받으면 'quiz', 'review', 'history', 'fire' 를 더한다
  */
 window.ADS = {
   enabled: false,
-  client: '',
+  client: 'ca-pub-3209887784875053',
+  pages: ['gtelp'],
   slots: { home: '', list: '', result: '', review: '', map: '' },
 };
 
