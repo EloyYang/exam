@@ -18,7 +18,7 @@
 
 공식 문제가 아니라 출제 유형에 맞춰 만든 연습 문제예요. 구글 로그인하면 휴대폰·컴퓨터 기록이 이어져요.
 
-👉 https://eloylab.it/gtelp.html?utm_source=naver_cafe&utm_medium=post&utm_campaign=gtelp_launch
+👉 https://eloylab.it/exam/gtelp.html?utm_source=naver_cafe&utm_medium=post&utm_campaign=gtelp_launch
 
 틀린 문제나 어색한 해설 있으면 댓글로 알려 주세요. 바로 고칠게요.
 
@@ -35,8 +35,8 @@
 - 유형별 개념 정리와 출제 빈도
 - 오답·★ 헷갈린 문제만 모아 다시 풀기
 
-👉 공채: https://eloylab.it/fire.html?kind=open&utm_source=naver_cafe&utm_medium=post&utm_campaign=fire_launch
-👉 경채: https://eloylab.it/fire.html?kind=car&utm_source=naver_cafe&utm_medium=post&utm_campaign=fire_launch
+👉 공채: https://eloylab.it/exam/fire.html?kind=open&utm_source=naver_cafe&utm_medium=post&utm_campaign=fire_launch
+👉 경채: https://eloylab.it/exam/fire.html?kind=car&utm_source=naver_cafe&utm_medium=post&utm_campaign=fire_launch
 
 무료이고 가입 없이 바로 쓸 수 있어요. 해설 오류 제보 환영합니다.
 
@@ -53,7 +53,7 @@
 - 시대별 영토 지도와 기출 포인트
 - 유물 사진 보고 시대 쳐서 외우는 타자 암기 연습
 
-👉 https://eloylab.it/?utm_source=naver_cafe&utm_medium=post&utm_campaign=history_launch
+👉 https://eloylab.it/exam/?utm_source=naver_cafe&utm_medium=post&utm_campaign=history_launch
 
 ---
 
