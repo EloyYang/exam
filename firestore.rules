@@ -13,5 +13,40 @@ service cloud.firestore {
     // 빌링키·결제 내역·체험 기록은 서버 전용
     match /billing/{document=**} { allow read, write: if false; }
     match /trials/{document=**} { allow read, write: if false; }
+    // ── 스터디 라운지 (community.html) ──
+    function signed() { return request.auth != null; }
+    function isAdmin() { return signed() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function str(v, lo, hi) { return v is string && v.size() >= lo && v.size() <= hi; }
+    function mine() { return signed() && request.resource.data.uid == request.auth.uid && request.resource.data.t == request.time && str(request.resource.data.name, 2, 12); }
+    function owner() { return signed() && (resource.data.uid == request.auth.uid || isAdmin()); }
+    match /admins/{uid} { allow read: if signed() && request.auth.uid == uid; allow write: if false; }
+    match /community/{exam} {
+      match /posts/{pid} {
+        allow read: if true;
+        allow create: if exam in ['history', 'fire', 'gtelp'] && mine()
+          && request.resource.data.keys().hasOnly(['uid', 'name', 'cat', 'title', 'body', 't', 'nc'])
+          && request.resource.data.cat in ['질문', '정보', '스터디 모집', '합격 후기', '잡담']
+          && str(request.resource.data.title, 1, 100) && str(request.resource.data.body, 1, 5000) && request.resource.data.nc == 0;
+        allow update: if signed() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nc'])
+          && request.resource.data.nc == resource.data.nc + 1;
+        allow delete: if owner();
+        match /comments/{cid} {
+          allow read: if true;
+          allow create: if mine() && request.resource.data.keys().hasOnly(['uid', 'name', 'body', 't']) && str(request.resource.data.body, 1, 1000);
+          allow delete: if owner();
+        }
+      }
+      match /chat/{mid} {
+        allow read: if true;
+        allow create: if exam in ['history', 'fire', 'gtelp'] && mine()
+          && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 't']) && str(request.resource.data.text, 1, 300);
+        allow delete: if owner();
+      }
+    }
+    match /reports/{rid} {
+      allow create: if signed() && request.resource.data.uid == request.auth.uid && request.resource.data.keys().hasOnly(['uid', 'path', 'why', 't']);
+      allow read, delete: if isAdmin();
+    }
+
   }
 }

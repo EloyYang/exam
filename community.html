@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>스터디 라운지 — 같은 시험 준비하는 사람들 · 시험 준비 노트</title>
+  <meta name="description" content="한국사능력검정시험, 소방공무원, 지텔프를 준비하는 사람들이 질문하고 정보를 나누고 함께 공부하는 게시판과 실시간 채팅">
+  <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a1916" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="google-adsense-account" content="ca-pub-3209887784875053">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/community.css">
+</head>
+<body class="review-page">
+  <header class="topbar">
+    <div class="brand"><a class="brand-mark home-mark" href="index.html" title="처음 화면">✓</a><div><h1>스터디 라운지</h1><p class="brand-sub">같은 시험 준비하는 사람들과 함께</p></div></div>
+    <nav class="top-links"><a class="top-link" href="index.html">처음 화면</a></nav>
+  </header>
+
+  <main class="review cm" id="cm">
+    <div class="cm-exams" role="tablist">
+      <button data-exam="history">한능검</button><button data-exam="fire">소방</button><button data-exam="gtelp">지텔프</button>
+    </div>
+    <div class="cm-tabs" role="tablist">
+      <button data-tab="board">게시판</button><button data-tab="chat">실시간 채팅</button>
+    </div>
+    <div id="cm-login" class="cm-login" hidden>글쓰기와 채팅은 오른쪽 위 <b>Google 로그인</b> 뒤에 할 수 있어요. 읽기는 누구나 할 수 있어요.</div>
+    <section id="cm-board"></section>
+    <section id="cm-chat" hidden>
+      <div id="cm-msgs" class="cm-msgs" aria-live="polite"></div>
+      <form id="cm-chat-form" class="cm-chat-form"><input name="text" maxlength="300" placeholder="메시지 (300자)" autocomplete="off"><button>보내기</button></form>
+    </section>
+    <p class="cm-rule">서로 존중해 주세요. 욕설·광고·개인정보·문제 유출 글은 신고되면 지워져요. 닉네임만 공개되고 이메일·실명은 보이지 않아요.</p>
+  </main>
+  <footer class="review site-foot"><a href="index.html">처음 화면</a> · <a href="study/index.html">개념 노트</a> · <a href="about.html">사이트 소개</a> · <a href="privacy.html">개인정보처리방침</a></footer>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/userstore.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/community.js"></script>
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>
