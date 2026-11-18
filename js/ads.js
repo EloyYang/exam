@@ -10,7 +10,7 @@
   const on = !!(A.enabled && /^ca-pub-\d{10,}$/.test(A.client || ''));
   if (!on) return;
   const page = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
-  if (Array.isArray(A.pages) && !A.pages.includes(page)) return;
+  if (Array.isArray(A.pages) && !A.pages.includes(page) && !/\/study\//.test(location.pathname)) return;
   let loaded = false;
   function load() {
     if (loaded) return; loaded = true;

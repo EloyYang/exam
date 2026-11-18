@@ -1,0 +1,16 @@
+.study{line-height:1.75}
+.study h2{margin:1.6em 0 .5em;font-size:1.15rem;border-bottom:1px solid var(--line);padding-bottom:.3em}
+.study .lead{font-size:1.02rem}
+.study .pts li{margin:.35em 0}
+.study .lv{display:inline-block;min-width:6.5em;font-size:.8rem;color:#b5462c;font-weight:700}
+.study table{width:100%;border-collapse:collapse;font-size:.9rem;display:block;overflow-x:auto}
+.study th,.study td{border:1px solid var(--line);padding:.4em .5em;text-align:left;vertical-align:top}
+.study th{background:var(--surface-2)}
+.study blockquote{margin:.8em 0;padding:.7em 1em;background:var(--surface);border-left:3px solid var(--line);font-size:.92rem}
+.study cite{display:block;margin-top:.3em;font-size:.8rem;opacity:.7;font-style:normal}
+.study .qs>li{margin:1.2em 0}
+.study details{margin-top:.4em}
+.study summary{cursor:pointer;font-weight:600}
+.study .list{columns:2;column-gap:2em}
+.study .cta{margin:2em 0;font-weight:700}
+@media(max-width:600px){.study .list{columns:1}}
