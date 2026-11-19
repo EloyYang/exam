@@ -17,8 +17,30 @@ service cloud.firestore {
     function signed() { return request.auth != null; }
     function isAdmin() { return signed() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
     function str(v, lo, hi) { return v is string && v.size() >= lo && v.size() <= hi; }
-    function mine() { return signed() && request.resource.data.uid == request.auth.uid && request.resource.data.t == request.time && str(request.resource.data.name, 2, 12); }
+    // 글·댓글·채팅의 name 은 profiles/{uid} 에 저장한 내 닉네임과 같아야 한다
+    function myNick() { return get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.name; }
+    function mine() { return signed() && request.resource.data.uid == request.auth.uid && request.resource.data.t == request.time && request.resource.data.name == myNick(); }
+    function nickOk(n) { return n is string && n.matches('^[가-힣a-zA-Z0-9_]{2,12}$') && !(n.lower() in ['관리자', '운영자', 'admin', '시험준비노트', '스터디라운지']); }
     function owner() { return signed() && (resource.data.uid == request.auth.uid || isAdmin()); }
+    // 닉네임: nicknames/{소문자 닉네임} 으로 중복을 막고, profiles/{uid} 에 내 닉네임을 둔다
+    match /nicknames/{key} {
+      allow read: if true;
+      allow create, update: if signed() && request.resource.data.keys().hasOnly(['uid', 'name', 't'])
+        && request.resource.data.uid == request.auth.uid && request.resource.data.t == request.time
+        && nickOk(request.resource.data.name) && request.resource.data.name.lower() == key
+        && (resource == null || resource.data.uid == request.auth.uid);
+      allow delete: if signed() && resource.data.uid == request.auth.uid;
+    }
+    match /profiles/{uid} {
+      allow read: if true;
+      allow create, update: if signed() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 't']) && request.resource.data.t == request.time
+        && nickOk(request.resource.data.name)
+        && getAfter(/databases/$(database)/documents/nicknames/$(request.resource.data.name.lower())).data.uid == uid
+        && (resource == null || resource.data.name.lower() == request.resource.data.name.lower()
+            || !existsAfter(/databases/$(database)/documents/nicknames/$(resource.data.name.lower())));
+      allow delete: if false;
+    }
     match /admins/{uid} { allow read: if signed() && request.auth.uid == uid; allow write: if false; }
     match /community/{exam} {
       match /posts/{pid} {

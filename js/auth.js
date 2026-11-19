@@ -38,6 +38,7 @@ function renderBox(state) {
     <div class="auth-menu" hidden>
       <p>${esc(u.email)}</p>
       ${S.syncError ? `<p class="auth-err"><b>계정에 저장하지 못하고 있어요</b><br>${esc(S.syncError)}<br><small>지금은 이 브라우저에만 저장돼요. 문제가 해결되면 다음 접속 때 자동으로 올라가요.</small></p>` : '<p class="auth-note">풀이 기록·오답·외운 문항이 이 계정에 저장돼요. 다른 기기에서는 접속(새로고침)할 때 맞춰져요.</p>'}
+      <a class="auth-nick" href="${/\/study\//.test(location.pathname) ? '../' : ''}community.html#nick">스터디 라운지 닉네임 설정 ›</a>
       <button type="button" class="auth-out">로그아웃</button>
     </div>`;
 }

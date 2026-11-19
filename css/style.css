@@ -815,6 +815,8 @@ a.brand-mark { text-decoration: none; }
 .auth-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .auth-sync { color: var(--muted); font-size: 12px; }
 .auth-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 1300; width: 240px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); font-size: 13px; }
+.auth-nick { display: block; margin: 2px 0 8px; font-weight: 700; color: var(--accent); text-decoration: none; }
+.auth-nick:hover { text-decoration: underline; }
 .auth-menu p { margin: 0 0 6px; word-break: break-all; }
 .auth-note { color: var(--muted); font-size: 12px; }
 .auth-out { width: 100%; padding: 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); font-weight: 700; }

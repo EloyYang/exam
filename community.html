@@ -19,19 +19,33 @@
   </header>
 
   <main class="review cm" id="cm">
-    <div class="cm-exams" role="tablist">
-      <button data-exam="history">한능검</button><button data-exam="fire">소방</button><button data-exam="gtelp">지텔프</button>
+    <div class="cm-top">
+      <div class="cm-exams" role="tablist" aria-label="시험">
+        <button data-exam="history">한능검</button><button data-exam="fire">소방</button><button data-exam="gtelp">지텔프</button>
+      </div>
+      <div class="cm-tabs" role="tablist" aria-label="게시판·채팅">
+        <button data-tab="board">게시판</button><button data-tab="chat">실시간 채팅</button>
+      </div>
     </div>
-    <div class="cm-tabs" role="tablist">
-      <button data-tab="board">게시판</button><button data-tab="chat">실시간 채팅</button>
-    </div>
-    <div id="cm-login" class="cm-login" hidden>글쓰기와 채팅은 오른쪽 위 <b>Google 로그인</b> 뒤에 할 수 있어요. 읽기는 누구나 할 수 있어요.</div>
+    <div id="cm-me" class="cm-me"></div>
     <section id="cm-board"></section>
-    <section id="cm-chat" hidden>
+    <section id="cm-chat" class="cm-chat" hidden>
+      <div class="cm-chat-head"><b id="cm-chat-title">채팅방</b><small>최근 100개 메시지</small></div>
       <div id="cm-msgs" class="cm-msgs" aria-live="polite"></div>
-      <form id="cm-chat-form" class="cm-chat-form"><input name="text" maxlength="300" placeholder="메시지 (300자)" autocomplete="off"><button>보내기</button></form>
+      <p id="cm-chat-hint" class="cm-chat-hint" hidden></p>
+      <form id="cm-chat-form" class="cm-chat-form" hidden><textarea name="text" rows="1" maxlength="300" placeholder="메시지를 입력하세요 (Enter 보내기 · Shift+Enter 줄바꿈)" autocomplete="off"></textarea><button>전송</button></form>
     </section>
     <p class="cm-rule">서로 존중해 주세요. 욕설·광고·개인정보·문제 유출 글은 신고되면 지워져요. 닉네임만 공개되고 이메일·실명은 보이지 않아요.</p>
+    <dialog id="cm-nick" class="cm-dlg">
+      <form id="cm-nick-form" method="dialog">
+        <h2>닉네임 정하기</h2>
+        <p>게시글·댓글·채팅에 이 닉네임이 보여요. 다른 분과 같은 닉네임은 쓸 수 없어요.</p>
+        <input name="nick" maxlength="12" placeholder="한글·영문·숫자·_ 2~12자" autocomplete="off" required>
+        <p class="cm-nick-err" role="alert"></p>
+        <small>바꾸기 전에 쓴 글에는 그때의 닉네임이 그대로 남아요.</small>
+        <div class="cm-actions"><button type="button" class="cm-btn ghost" data-act="nick-cancel">취소</button><button class="cm-btn">저장</button></div>
+      </form>
+    </dialog>
   </main>
   <footer class="review site-foot"><a href="index.html">처음 화면</a> · <a href="study/index.html">개념 노트</a> · <a href="about.html">사이트 소개</a> · <a href="privacy.html">개인정보처리방침</a></footer>
 

@@ -1,36 +1,176 @@
-.cm-exams,.cm-tabs{display:flex;gap:6px;margin:4px 0 10px;flex-wrap:wrap}
-.cm-exams button,.cm-tabs button{padding:7px 14px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--text);font:inherit;font-weight:700;cursor:pointer}
-.cm-exams button.on,.cm-tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
-.cm-tabs button{border-radius:8px;font-size:14px}
-.cm-login{padding:10px 12px;border:1px dashed var(--line);border-radius:8px;margin:8px 0;font-size:14px}
-.cm-new{margin:6px 0 10px;padding:8px 14px;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;font-weight:700;cursor:pointer}
-.cm-list{list-style:none;padding:0;margin:0}
-.cm-list li{border-bottom:1px solid var(--line)}
-.cm-list a{display:block;padding:11px 4px;color:var(--text);text-decoration:none}
-.cm-list a:hover{background:var(--surface-2)}
-.cm-list small{display:block;margin-top:3px;opacity:.65;font-size:12px}
-.cm-cat{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line)}
-.cm-nc{color:var(--accent)}
-.cm-empty{padding:16px 4px;opacity:.7;list-style:none}
-.cm-form,.cm-cform{display:flex;flex-direction:column;gap:8px}
-.cm-form input,.cm-form textarea,.cm-form select,.cm-cform textarea,.cm-chat-form input{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text)}
-.cm-actions{display:flex;justify-content:flex-end;gap:12px;align-items:center}
-.cm-form button,.cm-cform button,.cm-chat-form button{padding:9px 16px;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;font-weight:700;cursor:pointer;align-self:flex-end}
-.cm-post h2{margin:4px 0 10px}
-.cm-meta{font-size:13px;opacity:.75;margin:0}
-.cm-body{white-space:pre-wrap;line-height:1.75;padding:6px 0 14px;border-bottom:1px solid var(--line)}
-.cm-tools{display:flex;gap:10px;align-items:center}
-.cm-del,.cm-report{border:0;background:none;color:#b5462c;cursor:pointer;font:inherit;font-size:12px;padding:0}
-.cm-comments{list-style:none;padding:0}
-.cm-comments li{padding:8px 0;border-bottom:1px solid var(--line)}
-.cm-comments p{margin:4px 0 0;white-space:pre-wrap}
-.cm-msgs{height:min(60vh,520px);overflow-y:auto;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
-.cm-msg{max-width:80%}
-.cm-msg p{margin:2px 0 0;padding:7px 11px;border-radius:12px;background:var(--surface-2);white-space:pre-wrap;word-break:break-word}
-.cm-msg small{font-size:11px;opacity:.65}
-.cm-msg.me{align-self:flex-end;text-align:right}
-.cm-msg.me p{background:var(--accent);color:#fff}
-.cm-chat-form{display:flex;gap:8px;margin-top:8px}
-.cm-chat-form input{flex:1}
-.cm-rule{font-size:12px;opacity:.65;margin-top:18px}
-.cm-chat-form[hidden],.cm-login[hidden]{display:none}
+/* 스터디 라운지 — 게시판·글·댓글·채팅 */
+.cm { --cm-r: 10px; }
+.cm [hidden] { display: none !important; }
+
+/* 상단: 시험 선택 + 게시판/채팅 */
+.cm-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 12px; }
+.cm-exams, .cm-tabs { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.cm-exams button, .cm-tabs button { padding: 8px 16px; border: 0; border-right: 1px solid var(--line); background: none; color: var(--muted); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.cm-exams button:last-child, .cm-tabs button:last-child { border-right: 0; }
+.cm-exams button.on, .cm-tabs button.on { background: var(--accent); color: #fff; }
+
+/* 공통 버튼 */
+.cm-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 16px; border: 1px solid var(--accent); border-radius: 6px; background: var(--accent); color: #fff; font: inherit; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; white-space: nowrap; }
+.cm-btn.ghost { background: var(--surface); color: var(--text); border-color: var(--line); }
+.cm-btn.sm { padding: 6px 12px; font-size: 13px; }
+.cm-btn:disabled { opacity: .5; cursor: default; }
+.cm-txtbtn { border: 0; background: none; padding: 2px 4px; color: var(--muted); font: inherit; font-size: 12.5px; cursor: pointer; }
+.cm-txtbtn:hover { color: var(--text); text-decoration: underline; }
+.cm-txtbtn.cm-del:hover { color: #c0392b; }
+.cm-link { border: 0; background: none; padding: 0; color: var(--accent); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.cm-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--cm-r); padding: 18px 20px; margin-bottom: 12px; }
+.cm-empty { padding: 28px 8px; text-align: center; color: var(--muted); list-style: none; font-size: 14px; }
+
+/* 아바타: 닉네임 첫 글자 */
+.cm-av { flex: none; width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 15px; color: #fff; background: hsl(var(--h) 45% 48%); }
+.cm-av.sm { width: 28px; height: 28px; border-radius: 9px; font-size: 13px; }
+
+/* 내 닉네임 줄 */
+.cm-me { display: flex; align-items: center; gap: 10px; padding: 10px 14px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: var(--cm-r); background: var(--surface-2); font-size: 14px; }
+.cm-me:empty { display: none; }
+.cm-me-txt { flex: 1; min-width: 0; }
+.cm-me-txt small { display: block; color: var(--muted); font-size: 12px; margin-top: 1px; }
+
+/* 게시판 목록 */
+.cm-board-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.cm-cats { flex: 1; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.cm-cats::-webkit-scrollbar { display: none; }
+.cm-cats button { flex: none; padding: 6px 11px; border: 1px solid transparent; border-radius: 6px; background: none; color: var(--muted); font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+.cm-cats button:hover { color: var(--text); }
+.cm-cats button.on { color: var(--accent); border-color: var(--accent); background: var(--surface); }
+.cm-table { background: var(--surface); border: 1px solid var(--line); border-radius: var(--cm-r); overflow: hidden; }
+.cm-thead, .cm-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) 120px 64px; align-items: center; gap: 10px; padding: 0 16px; }
+.cm-thead { height: 38px; background: var(--surface-2); border-bottom: 1px solid var(--line); font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.cm-thead span:nth-child(2) { padding-left: 2px; }
+.cm-thead span:nth-child(n+3), .cm-row-name, .cm-row-time { text-align: center; }
+.cm-list { list-style: none; margin: 0; padding: 0; }
+.cm-list li + li { border-top: 1px solid var(--line); }
+.cm-row { min-height: 48px; padding-top: 8px; padding-bottom: 8px; color: var(--text); text-decoration: none; font-size: 14.5px; }
+.cm-row:hover { background: var(--surface-2); }
+.cm-row:hover .cm-title-txt { text-decoration: underline; }
+.cm-row-title { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.cm-title-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-row-name { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-row-time { font-size: 12.5px; color: var(--muted); }
+.cm-nc { flex: none; color: var(--accent); font-size: 13px; }
+.cm-newb { flex: none; display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 4px; background: #e5533d; color: #fff; font-size: 10px; font-style: normal; font-weight: 900; }
+
+/* 말머리 */
+.cm-cat { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 12px; font-weight: 700; white-space: nowrap; color: #5d6470; background: rgba(120, 128, 140, .14); }
+.cm-cat[data-c="질문"] { color: #2463b5; background: rgba(36, 99, 181, .12); }
+.cm-cat[data-c="정보"] { color: #1d7f55; background: rgba(29, 127, 85, .12); }
+.cm-cat[data-c="스터디 모집"] { color: #8a52b8; background: rgba(138, 82, 184, .13); }
+.cm-cat[data-c="합격 후기"] { color: #b86a12; background: rgba(214, 140, 30, .15); }
+@media (prefers-color-scheme: dark) {
+  .cm-cat { color: #b9bfc8; }
+  .cm-cat[data-c="질문"] { color: #8fb8f0; } .cm-cat[data-c="정보"] { color: #7fd1a8; }
+  .cm-cat[data-c="스터디 모집"] { color: #c9a2ec; } .cm-cat[data-c="합격 후기"] { color: #f0bd73; }
+}
+
+/* 글쓰기 */
+.cm-card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-bottom: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+.cm-card-head h2 { margin: 0; font-size: 18px; }
+.cm-by { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 700; }
+.cm-form { display: flex; flex-direction: column; gap: 10px; }
+.cm-form-row { display: flex; gap: 8px; }
+.cm-form-row select { flex: none; width: 130px; }
+.cm-form-row input { flex: 1; min-width: 0; }
+.cm input, .cm textarea, .cm select { font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--text); }
+.cm input:focus, .cm textarea:focus, .cm select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+.cm-form textarea { resize: vertical; line-height: 1.7; min-height: 260px; }
+.cm-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* 글 보기 */
+.cm-crumb { margin: 0 0 8px; font-size: 12.5px; color: var(--muted); }
+.cm-post-title { margin: 0 0 14px; font-size: 21px; line-height: 1.4; word-break: break-word; }
+.cm-post-title .cm-cat { vertical-align: 3px; font-size: 13px; }
+.cm-author { display: flex; align-items: center; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.cm-author b { display: block; font-size: 14.5px; }
+.cm-author small { color: var(--muted); font-size: 12.5px; }
+.cm-author-nc { margin-left: auto; font-size: 13px; color: var(--muted); }
+.cm-author-nc b { display: inline; color: var(--text); }
+.cm-body { white-space: pre-wrap; word-break: break-word; line-height: 1.85; font-size: 15.5px; padding: 22px 2px 28px; min-height: 120px; }
+.cm-post-tools { display: flex; align-items: center; gap: 4px; padding-top: 12px; border-top: 1px solid var(--line); }
+.cm-grow { flex: 1; }
+
+/* 댓글 */
+.cm-cmts h3 { margin: 0 0 4px; font-size: 16px; }
+.cm-cmts h3 b { color: var(--accent); }
+.cm-comments { list-style: none; margin: 0; padding: 0; }
+.cm-comments > li { display: flex; gap: 10px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.cm-comments > li.cm-empty { display: block; padding: 22px 0; }
+.cm-cmt { flex: 1; min-width: 0; }
+.cm-cmt-head { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.cm-op { padding: 1px 6px; border-radius: 4px; border: 1px solid var(--accent); color: var(--accent); font-size: 11px; font-weight: 700; }
+.cm-cmt p { margin: 4px 0 6px; white-space: pre-wrap; word-break: break-word; line-height: 1.6; font-size: 14.5px; }
+.cm-cmt-foot { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.cm-cmt-foot .cm-txtbtn { font-size: 12px; }
+.cm-cform { margin-top: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px 10px; background: var(--surface); }
+.cm-cform:focus-within { border-color: var(--accent); }
+.cm-cform-who { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
+.cm-cform textarea { width: 100%; box-sizing: border-box; border: 0; padding: 4px 0; resize: none; background: transparent; font-size: 14.5px; }
+.cm-cform textarea:focus { outline: none; }
+.cm-cform-foot { display: flex; justify-content: flex-end; }
+.cm-cmt-login { margin: 14px 0 0; padding: 14px; text-align: center; font-size: 14px; color: var(--muted); background: var(--surface-2); border-radius: 8px; }
+
+/* 채팅 */
+.cm-chat { border: 1px solid var(--line); border-radius: var(--cm-r); overflow: hidden; background: var(--surface); }
+.cm-chat-head { display: flex; align-items: baseline; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.cm-chat-head small { color: var(--muted); font-size: 12px; }
+.cm-msgs { height: min(62vh, 560px); overflow-y: auto; padding: 8px 14px 14px; background: var(--surface-2); display: flex; flex-direction: column; }
+.cm-day { text-align: center; margin: 14px 0 6px; }
+.cm-day span { display: inline-block; padding: 3px 12px; border-radius: 6px; background: rgba(0, 0, 0, .08); color: var(--muted); font-size: 12px; }
+.cm-msg { display: flex; gap: 8px; align-items: flex-start; margin-top: 3px; max-width: 100%; }
+.cm-msg.first { margin-top: 10px; }
+.cm-av-gap { flex: none; width: 36px; }
+.cm-msg-col { min-width: 0; display: flex; flex-direction: column; max-width: min(72%, 520px); }
+.cm-msg-name { font-size: 12.5px; font-weight: 700; margin: 0 0 4px 2px; }
+.cm-msg-line { display: flex; align-items: flex-end; gap: 5px; }
+.cm-msg-line p { margin: 0; padding: 8px 12px; border-radius: 4px 14px 14px 14px; background: var(--surface); border: 1px solid var(--line); white-space: pre-wrap; word-break: break-word; line-height: 1.5; font-size: 14.5px; }
+.cm-msg:not(.first) .cm-msg-line p { border-radius: 14px; }
+.cm-msg-meta { flex: none; display: flex; align-items: center; gap: 2px; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.cm-msg-del { border: 0; background: none; color: var(--muted); font-size: 14px; line-height: 1; padding: 0 3px; cursor: pointer; opacity: 0; }
+.cm-msg:hover .cm-msg-del, .cm-msg-del:focus { opacity: 1; }
+@media (hover: none) { .cm-msg-del { opacity: .6; } }
+.cm-msg.me { justify-content: flex-end; }
+.cm-msg.me .cm-msg-line { flex-direction: row-reverse; }
+.cm-msg.me .cm-msg-line p { background: var(--accent); border-color: var(--accent); color: #fff; border-radius: 14px 4px 14px 14px; }
+.cm-msg.me:not(.first) .cm-msg-line p { border-radius: 14px; }
+.cm-msg.me .cm-msg-meta { flex-direction: row-reverse; }
+.cm-chat-hint { margin: 0; padding: 14px; text-align: center; font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); }
+.cm-chat-form { display: flex; gap: 8px; align-items: flex-end; padding: 10px 12px; border-top: 1px solid var(--line); }
+.cm-chat-form textarea { flex: 1; resize: none; min-height: 42px; max-height: 120px; box-sizing: border-box; line-height: 1.45; field-sizing: content; }
+.cm-chat-form button { flex: none; height: 42px; padding: 0 18px; border: 0; border-radius: 6px; background: var(--accent); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+
+/* 닉네임 창 */
+.cm-dlg { width: min(92vw, 380px); border: 1px solid var(--line); border-radius: 12px; padding: 22px; background: var(--surface); color: var(--text); box-shadow: 0 12px 40px rgba(0, 0, 0, .3); }
+.cm-dlg::backdrop { background: rgba(0, 0, 0, .45); }
+.cm-dlg h2 { margin: 0 0 6px; font-size: 18px; }
+.cm-dlg p { margin: 0 0 12px; font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+.cm-dlg input { width: 100%; box-sizing: border-box; }
+.cm-dlg .cm-nick-err { min-height: 18px; margin: 6px 0 2px; color: #c0392b; font-weight: 700; }
+.cm-dlg small { display: block; color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+
+.cm-rule { font-size: 12px; color: var(--muted); margin-top: 18px; }
+
+/* 모바일 */
+@media (max-width: 640px) {
+  .cm-top { flex-direction: column; align-items: stretch; }
+  .cm-exams button, .cm-tabs button { flex: 1; padding: 8px 6px; }
+  .cm-board-head { flex-wrap: wrap; }
+  .cm-write { order: -1; margin-left: auto; }
+  .cm-cats { flex-basis: 100%; }
+  .cm-thead { display: none; }
+  .cm-row { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "cat title" "meta meta"; row-gap: 4px; column-gap: 6px; padding: 11px 14px; }
+  .cm-row-cat { grid-area: cat; }
+  .cm-row-title { grid-area: title; }
+  .cm-row-name, .cm-row-time { grid-row: 2; text-align: left; font-size: 12px; color: var(--muted); }
+  .cm-row-name { grid-column: 1 / 3; }
+  .cm-row-name { padding-right: 70px; }
+  .cm-row-time { grid-column: 1 / 3; justify-self: end; }
+  .cm-card { padding: 16px 14px; }
+  .cm-post-title { font-size: 19px; }
+  .cm-form-row { flex-direction: column; }
+  .cm-form-row select { width: 100%; }
+  .cm-msg-col { max-width: 78%; }
+}
