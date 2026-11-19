@@ -1,5 +1,5 @@
 .cm-exams,.cm-tabs{display:flex;gap:6px;margin:4px 0 10px;flex-wrap:wrap}
-.cm-exams button,.cm-tabs button{padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--text);font:inherit;font-weight:700;cursor:pointer}
+.cm-exams button,.cm-tabs button{padding:7px 14px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--text);font:inherit;font-weight:700;cursor:pointer}
 .cm-exams button.on,.cm-tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .cm-tabs button{border-radius:8px;font-size:14px}
 .cm-login{padding:10px 12px;border:1px dashed var(--line);border-radius:8px;margin:8px 0;font-size:14px}
@@ -9,7 +9,7 @@
 .cm-list a{display:block;padding:11px 4px;color:var(--text);text-decoration:none}
 .cm-list a:hover{background:var(--surface-2)}
 .cm-list small{display:block;margin-top:3px;opacity:.65;font-size:12px}
-.cm-cat{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line)}
+.cm-cat{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line)}
 .cm-nc{color:var(--accent)}
 .cm-empty{padding:16px 4px;opacity:.7;list-style:none}
 .cm-form,.cm-cform{display:flex;flex-direction:column;gap:8px}
