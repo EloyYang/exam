@@ -151,10 +151,82 @@
 .cm-dlg .cm-nick-err { min-height: 18px; margin: 6px 0 2px; color: #c0392b; font-weight: 700; }
 .cm-dlg small { display: block; color: var(--muted); font-size: 12px; margin-bottom: 16px; }
 
+/* 탭 배지 */
+.cm-badge { display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; margin-left: 5px; border-radius: 5px; background: #e5533d; color: #fff; font-size: 11px; font-style: normal; font-weight: 800; vertical-align: 1px; box-sizing: border-box; }
+.cm-center { text-align: center; color: var(--muted); font-size: 14.5px; }
+.cm-center p { margin: 0 0 12px; }
+.cm-center p:last-child { margin-bottom: 0; }
+.cm-hint { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.cm-card h3 { margin: 0 0 10px; font-size: 16px; }
+.cm-card h3 b { color: var(--accent); }
+.cm-tag { display: inline-block; padding: 2px 8px; border-radius: 5px; border: 1px solid var(--line); color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.cm-tag.soft { border: 0; background: var(--surface-2); }
+.cm-danger { color: #c0392b !important; }
+.cm-btn.danger { color: #c0392b; border-color: rgba(192, 57, 43, .45); }
+
+/* 섹션·그룹 카드 */
+.cm-sec { margin-bottom: 18px; }
+.cm-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.cm-sec-head h3 { margin: 0; font-size: 16px; }
+.cm-glist { display: grid; gap: 8px; }
+.cm-glist > .cm-empty { background: var(--surface); border: 1px dashed var(--line); border-radius: var(--cm-r); padding: 22px 12px; }
+.cm-gcard { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--cm-r); }
+.cm-gmain { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; }
+.cm-gmain:hover b { text-decoration: underline; }
+.cm-gicon { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 19px; font-weight: 900; color: #fff; background: linear-gradient(135deg, hsl(var(--h) 55% 50%), hsl(calc(var(--h) + 40) 50% 42%)); }
+.cm-gicon.lg { width: 54px; height: 54px; border-radius: 14px; font-size: 23px; }
+.cm-ginfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cm-ginfo b { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-ginfo small { font-size: 12.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-gmeta { font-size: 12px !important; }
+.cm-lock { font-style: normal; font-size: 12px; }
+.cm-gbtns { flex: none; display: flex; gap: 6px; }
+
+/* 그룹 페이지 */
+.cm-back { display: inline-block; margin-bottom: 10px; font-size: 13px; color: var(--muted); text-decoration: none; }
+.cm-back:hover { color: var(--text); }
+.cm-gtitle { display: flex; align-items: center; gap: 12px; }
+.cm-gtitle h2 { margin: 0 0 3px; font-size: 20px; word-break: break-word; }
+.cm-gtitle .cm-gmeta { margin: 0; color: var(--muted); font-size: 13px !important; }
+.cm-gdesc { margin: 12px 0 0; white-space: pre-wrap; font-size: 14px; line-height: 1.6; }
+.cm-gtabs { display: flex; gap: 4px; margin: 14px -20px -18px; padding: 0 12px; border-top: 1px solid var(--line); }
+.cm-gtabs a { padding: 11px 12px; font-size: 14px; font-weight: 700; color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; }
+.cm-gtabs a:hover { color: var(--text); }
+.cm-gtabs a.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* 사람 목록 */
+.cm-people { list-style: none; margin: 0; padding: 0; }
+.cm-person { display: flex; align-items: center; gap: 10px; padding: 9px 0; }
+.cm-person + .cm-person { border-top: 1px solid var(--line); }
+.cm-pname { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 14.5px; }
+.cm-pname small { color: var(--muted); font-size: 12.5px; }
+.cm-pact { flex: none; display: flex; align-items: center; gap: 6px; }
+.cm-fsearch { display: flex; gap: 6px; }
+.cm-fsearch input { flex: 1; min-width: 0; }
+#cm-found:not(:empty) { margin-top: 10px; border-top: 1px solid var(--line); }
+
+/* 그룹 만들기·설정 */
+.cm-field { display: flex; flex-direction: column; gap: 5px; flex: 1; font-size: 13.5px; font-weight: 700; }
+.cm-field small { font-weight: 400; color: var(--muted); }
+.cm-form .cm-field textarea { min-height: 0; }
+.cm-radio { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.cm-radio legend { padding: 0 4px; font-size: 13.5px; font-weight: 700; }
+.cm-radio label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.cm-danger-zone { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cm-danger-zone small { color: var(--muted); font-size: 12.5px; flex: 1; min-width: 200px; }
+
 .cm-rule { font-size: 12px; color: var(--muted); margin-top: 18px; }
 
 /* 모바일 */
 @media (max-width: 640px) {
+  .cm-gcard { flex-wrap: wrap; }
+  .cm-gbtns { margin-left: 56px; }
+  .cm-gtabs { margin: 14px -14px -16px; padding: 0 4px; }
+  .cm-gtabs a { flex: 1; text-align: center; padding: 11px 4px; font-size: 13.5px; }
+  .cm-fsearch { flex-wrap: wrap; }
+  .cm-fsearch input { flex-basis: 100%; }
+  .cm-fsearch .cm-btn { flex: 1; }
+  .cm-tabs button { font-size: 13px; padding: 8px 2px; }
   .cm-top { flex-direction: column; align-items: stretch; }
   .cm-exams button, .cm-tabs button { flex: 1; padding: 8px 6px; }
   .cm-board-head { flex-wrap: wrap; }

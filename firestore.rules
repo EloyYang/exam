@@ -21,6 +21,7 @@ service cloud.firestore {
     function myNick() { return get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.name; }
     function mine() { return signed() && request.resource.data.uid == request.auth.uid && request.resource.data.t == request.time && request.resource.data.name == myNick(); }
     function nickOk(n) { return n is string && n.matches('^[가-힣a-zA-Z0-9_]{2,12}$') && !(n.lower() in ['관리자', '운영자', 'admin', '시험준비노트', '스터디라운지']); }
+    function validExam(e) { return e in ['history', 'fire', 'gtelp']; }
     function owner() { return signed() && (resource.data.uid == request.auth.uid || isAdmin()); }
     // 닉네임: nicknames/{소문자 닉네임} 으로 중복을 막고, profiles/{uid} 에 내 닉네임을 둔다
     match /nicknames/{key} {
@@ -34,12 +35,122 @@ service cloud.firestore {
     match /profiles/{uid} {
       allow read: if true;
       allow create, update: if signed() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['name', 't']) && request.resource.data.t == request.time
+        && request.resource.data.keys().hasOnly(['name', 't', 'exam']) && request.resource.data.t == request.time
         && nickOk(request.resource.data.name)
+        && (!('exam' in request.resource.data) || validExam(request.resource.data.exam))
         && getAfter(/databases/$(database)/documents/nicknames/$(request.resource.data.name.lower())).data.uid == uid
         && (resource == null || resource.data.name.lower() == request.resource.data.name.lower()
             || !existsAfter(/databases/$(database)/documents/nicknames/$(resource.data.name.lower())));
       allow delete: if false;
+    }
+    // ── 친구 ──
+    //   friendReqs/{보낸uid_받는uid}  { from, to, fromName, toName, t }
+    //   friends/{작은uid_큰uid}       { uids: [신청한 사람, 수락한 사람], names: {uid: 닉네임}, t }
+    match /friendReqs/{rid} {
+      allow read: if signed() && resource.data.to == request.auth.uid;
+      allow read: if signed() && resource.data.from == request.auth.uid;
+      allow create: if signed() && request.resource.data.keys().hasOnly(['from', 'to', 'fromName', 'toName', 't'])
+        && request.resource.data.from == request.auth.uid && request.resource.data.to != request.auth.uid
+        && rid == request.auth.uid + '_' + request.resource.data.to
+        && request.resource.data.fromName == myNick()
+        && request.resource.data.toName == get(/databases/$(database)/documents/profiles/$(request.resource.data.to)).data.name
+        && request.resource.data.t == request.time;
+      allow delete: if signed() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+    }
+    match /friends/{pid} {
+      allow read: if signed() && request.auth.uid in resource.data.uids;
+      allow create: if signed() && request.resource.data.keys().hasOnly(['uids', 'names', 't'])
+        && request.resource.data.uids.size() == 2 && request.resource.data.uids[1] == request.auth.uid
+        && pid == (request.resource.data.uids[0] < request.resource.data.uids[1]
+                   ? request.resource.data.uids[0] + '_' + request.resource.data.uids[1]
+                   : request.resource.data.uids[1] + '_' + request.resource.data.uids[0])
+        && exists(/databases/$(database)/documents/friendReqs/$(request.resource.data.uids[0] + '_' + request.auth.uid))
+        && request.resource.data.names.keys().hasOnly(request.resource.data.uids)
+        && request.resource.data.names[request.auth.uid] == myNick()
+        && request.resource.data.t == request.time;
+      allow delete: if signed() && request.auth.uid in resource.data.uids;
+    }
+    // ── 스터디 그룹 ──
+    //   groups/{gid}  { name, desc, exam, open, owner, members: [uid], names: {uid: 닉네임}, max, t }
+    //   groups/{gid}/chat, groups/{gid}/posts(/comments) 는 멤버만
+    //   groupInvites/{gid_uid}  { gid, uid, from, fromName, gname, exam, t }
+    function grp(gid) { return get(/databases/$(database)/documents/groups/$(gid)).data; }
+    function isMember(gid) { return signed() && request.auth.uid in grp(gid).members; }
+    function gOk(d) { return str(d.name, 2, 30) && str(d.desc, 0, 200) && d.open is bool && d.max is int && d.max >= 2 && d.max <= 50; }
+    match /groups/{gid} {
+      allow get: if resource.data.open == true
+        || (signed() && (request.auth.uid in resource.data.members
+            || exists(/databases/$(database)/documents/groupInvites/$(gid + '_' + request.auth.uid))));
+      allow list: if resource.data.open == true;
+      allow list: if signed() && request.auth.uid in resource.data.members;
+      allow create: if signed() && request.resource.data.keys().hasOnly(['name', 'desc', 'exam', 'open', 'owner', 'members', 'names', 'max', 't'])
+        && gOk(request.resource.data) && validExam(request.resource.data.exam)
+        && request.resource.data.owner == request.auth.uid
+        && request.resource.data.members == [request.auth.uid]
+        && request.resource.data.names.keys().hasOnly([request.auth.uid])
+        && request.resource.data.names[request.auth.uid] == myNick()
+        && request.resource.data.t == request.time;
+      allow update: if signed() && (
+        // 참여: 공개 그룹이거나 초대받았을 때, 정원 안에서 나를 맨 뒤에 추가
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'names'])
+          && !(request.auth.uid in resource.data.members)
+          && resource.data.members.size() < resource.data.max
+          && request.resource.data.members == resource.data.members.concat([request.auth.uid])
+          && request.resource.data.names.diff(resource.data.names).affectedKeys().hasOnly([request.auth.uid])
+          && request.resource.data.names[request.auth.uid] == myNick()
+          && (resource.data.open == true
+              || exists(/databases/$(database)/documents/groupInvites/$(gid + '_' + request.auth.uid))))
+        // 나가기 (방장은 나갈 수 없고 그룹을 지운다)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'names'])
+          && request.auth.uid in resource.data.members && request.auth.uid != resource.data.owner
+          && request.resource.data.members == resource.data.members.removeAll([request.auth.uid])
+          && request.resource.data.names.diff(resource.data.names).affectedKeys().hasOnly([request.auth.uid])
+          && !(request.auth.uid in request.resource.data.names))
+        // 방장: 이름·소개·공개 여부·정원 바꾸기, 멤버 내보내기
+        || (request.auth.uid == resource.data.owner
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'desc', 'open', 'max', 'members', 'names'])
+          && gOk(request.resource.data)
+          && request.resource.data.members.hasOnly(resource.data.members)
+          && request.auth.uid in request.resource.data.members
+          && request.resource.data.names.keys().hasOnly(request.resource.data.members)
+          && request.resource.data.max >= request.resource.data.members.size())
+      );
+      allow delete: if signed() && request.auth.uid == resource.data.owner;
+      match /chat/{mid} {
+        allow read: if isMember(gid);
+        allow create: if isMember(gid) && mine()
+          && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 't']) && str(request.resource.data.text, 1, 1000);
+        allow delete: if signed() && (resource.data.uid == request.auth.uid || request.auth.uid == grp(gid).owner);
+      }
+      match /posts/{pid} {
+        allow read: if isMember(gid);
+        allow create: if isMember(gid) && mine()
+          && request.resource.data.keys().hasOnly(['uid', 'name', 'cat', 'title', 'body', 't', 'nc'])
+          && str(request.resource.data.cat, 1, 20)
+          && str(request.resource.data.title, 1, 100) && str(request.resource.data.body, 1, 5000) && request.resource.data.nc == 0;
+        allow update: if isMember(gid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nc'])
+          && request.resource.data.nc == resource.data.nc + 1;
+        allow delete: if signed() && (resource.data.uid == request.auth.uid || request.auth.uid == grp(gid).owner);
+        match /comments/{cid} {
+          allow read: if isMember(gid);
+          allow create: if isMember(gid) && mine()
+            && request.resource.data.keys().hasOnly(['uid', 'name', 'body', 't']) && str(request.resource.data.body, 1, 1000);
+          allow delete: if signed() && (resource.data.uid == request.auth.uid || request.auth.uid == grp(gid).owner);
+        }
+      }
+    }
+    match /groupInvites/{iid} {
+      allow read: if signed() && resource.data.uid == request.auth.uid;
+      allow read: if signed() && resource.data.from == request.auth.uid;
+      allow create: if signed() && request.resource.data.keys().hasOnly(['gid', 'uid', 'from', 'fromName', 'gname', 'exam', 't'])
+        && iid == request.resource.data.gid + '_' + request.resource.data.uid
+        && request.resource.data.from == request.auth.uid && request.resource.data.fromName == myNick()
+        && request.auth.uid in grp(request.resource.data.gid).members
+        && !(request.resource.data.uid in grp(request.resource.data.gid).members)
+        && request.resource.data.gname == grp(request.resource.data.gid).name
+        && request.resource.data.exam == grp(request.resource.data.gid).exam
+        && request.resource.data.t == request.time;
+      allow delete: if signed() && (resource.data.uid == request.auth.uid || resource.data.from == request.auth.uid);
     }
     match /admins/{uid} { allow read: if signed() && request.auth.uid == uid; allow write: if false; }
     match /community/{exam} {

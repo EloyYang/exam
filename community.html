@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>스터디 라운지 — 같은 시험 준비하는 사람들 · 시험 준비 노트</title>
-  <meta name="description" content="한국사능력검정시험, 소방공무원, 지텔프를 준비하는 사람들이 질문하고 정보를 나누고 함께 공부하는 게시판과 실시간 채팅">
+  <meta name="description" content="한국사능력검정시험, 소방공무원, 지텔프를 준비하는 사람들이 질문하고 정보를 나누는 게시판·실시간 채팅, 친구 추가와 스터디 그룹(단체톡·그룹 게시판)">
   <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1a1916" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -23,18 +23,12 @@
       <div class="cm-exams" role="tablist" aria-label="시험">
         <button data-exam="history">한능검</button><button data-exam="fire">소방</button><button data-exam="gtelp">지텔프</button>
       </div>
-      <div class="cm-tabs" role="tablist" aria-label="게시판·채팅">
-        <button data-tab="board">게시판</button><button data-tab="chat">실시간 채팅</button>
+      <div class="cm-tabs" role="tablist" aria-label="라운지 메뉴">
+        <button data-tab="board">게시판</button><button data-tab="chat">채팅</button><button data-tab="groups">스터디 그룹<i class="cm-badge" hidden></i></button><button data-tab="friends">친구<i class="cm-badge" hidden></i></button>
       </div>
     </div>
     <div id="cm-me" class="cm-me"></div>
-    <section id="cm-board"></section>
-    <section id="cm-chat" class="cm-chat" hidden>
-      <div class="cm-chat-head"><b id="cm-chat-title">채팅방</b><small>최근 100개 메시지</small></div>
-      <div id="cm-msgs" class="cm-msgs" aria-live="polite"></div>
-      <p id="cm-chat-hint" class="cm-chat-hint" hidden></p>
-      <form id="cm-chat-form" class="cm-chat-form" hidden><textarea name="text" rows="1" maxlength="300" placeholder="메시지를 입력하세요 (Enter 보내기 · Shift+Enter 줄바꿈)" autocomplete="off"></textarea><button>전송</button></form>
-    </section>
+    <div id="cm-view"><p class="cm-empty">불러오는 중…</p></div>
     <p class="cm-rule">서로 존중해 주세요. 욕설·광고·개인정보·문제 유출 글은 신고되면 지워져요. 닉네임만 공개되고 이메일·실명은 보이지 않아요.</p>
     <dialog id="cm-nick" class="cm-dlg">
       <form id="cm-nick-form" method="dialog">
