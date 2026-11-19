@@ -91,7 +91,7 @@ window.setupExamHeader = function (page) {
     const auth = document.getElementById('auth-box');
     const links = [page === 'quiz' ? { href: `review.html?exam=${ex.id}`, label: '오답 노트' } : { href: `quiz.html?exam=${ex.id}`, label: '기출 풀기' }]
       .concat(ex.pages || [])
-      .concat([{ href: 'index.html', label: '시험 선택' }]);
+      .concat([{ href: `community.html?exam=${ex.id}`, label: '커뮤니티' }, { href: 'index.html', label: '시험 선택' }]);
     nav.innerHTML = links.map((l) => `<a class="top-link" href="${l.href}">${l.label}</a>`).join('');
     if (auth) nav.appendChild(auth);
   }
