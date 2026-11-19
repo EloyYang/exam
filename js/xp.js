@@ -92,9 +92,9 @@
     e.x += gain; e.n += n; e.c += c; d[k] = e;
     S.set(KEY, d);
     const s = summary();
-    toast(gain, s, s.lv > before);
+    toast(gain, s, s.lv > before, window.AVATAR && s.lv > before ? window.AVATAR.unlockedBetween(before, s.lv) : []);
     draw();
-    if (window.track) { if (s.lv > before) window.track('level_up', { level: s.lv }); }
+    if (s.lv > before) { if (window.track) window.track('level_up', { level: s.lv }); syncLevel(); }
     return gain;
   }
 
@@ -114,7 +114,7 @@
   }
   function cardHTML(s, big) {
     return `<div class="xp-card${big ? ' big' : ''}">
-      <div class="xp-badge"><small>Lv</small>${s.lv}</div>
+      ${window.AVATAR ? `<div class="xp-ava">${window.AVATAR.svg(window.AVATAR.load(), 64)}<span class="xp-ava-lv">Lv.${s.lv}</span></div>` : `<div class="xp-badge"><small>Lv</small>${s.lv}</div>`}
       <div class="xp-main">
         <div class="xp-row"><b class="xp-title">${esc(s.title)}</b><span class="xp-num">${fmt(s.cur)} / ${fmt(s.need)} XP</span></div>
         <div class="xp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${s.need}" aria-valuenow="${s.cur}"><i style="width:${s.pct}%"></i></div>
@@ -134,6 +134,7 @@
     const s = summary();
     dlg.querySelector('.xp-dlg-body').innerHTML = `${cardHTML(s, true)}
       <p class="xp-next">다음 레벨까지 <b>${fmt(s.need - s.cur)} XP</b> · ${s.next ? `Lv.${s.next.lv}이 되면 <b>${esc(s.next.title)}</b> 칭호를 받아요` : '최고 칭호에 도달했어요! 🎉'}</p>
+      <a class="xp-deco" href="${/\/study\//.test(location.pathname) ? '../' : ''}character.html">🎨 캐릭터 꾸미기 <small>레벨이 오르면 새 아이템이 열려요</small></a>
       <h3>경험치 얻는 법</h3>
       <ul class="xp-how">
         <li><b>기출·모의고사·문항 세트 채점</b><span>문항마다 5 XP, 맞히면 +5 XP</span></li>
@@ -155,12 +156,12 @@
     fillPanel(dlg); dlg.showModal();
   }
   let tt = null;
-  function toast(gain, s, up) {
+  function toast(gain, s, up, items) {
     let el = document.getElementById('xp-toast');
     if (!el) { el = document.createElement('div'); el.id = 'xp-toast'; el.className = 'xp-toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
     el.classList.toggle('up', up);
     el.innerHTML = up
-      ? `<b>🎉 레벨 업! Lv.${s.lv}</b><span>${esc(s.title)} · +${fmt(gain)} XP</span>`
+      ? `<b>🎉 레벨 업! Lv.${s.lv}</b><span>${esc(s.title)} · +${fmt(gain)} XP</span>${items && items.length ? `<a class="xp-new" href="character.html">새 아이템: ${items.map((x) => esc(x.name)).join(', ')} →</a>` : ''}`
       : `<b>+${fmt(gain)} XP</b><span>Lv.${s.lv} · 다음 레벨까지 ${fmt(s.need - s.cur)} XP</span>`;
     el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
     clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), up ? 4500 : 2600);
@@ -174,5 +175,30 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchNav); else watchNav();
 
-  window.XP = { add, summary, levelOf, open: openPanel };
+  /* ── 레벨을 스터디 라운지 프로필에 올리기 ──
+   *   profiles/{uid} 에 lv 만 덧붙인다. 닉네임(프로필)이 없으면 아무것도 하지 않는다. */
+  let fbUser = null, pushing = false;
+  async function syncLevel() {
+    const FB = window.FB; if (!FB || !fbUser || pushing) return;
+    const lv = summary().lv, av = window.AVATAR ? window.AVATAR.encode(window.AVATAR.load()) : null, mark = 'xp.lvSynced.' + fbUser.uid, sig = lv + '|' + av;
+    try { if (localStorage.getItem(mark) === sig) return; } catch (e) { /* 무시 */ }
+    pushing = true;
+    try {
+      const ref = FB.F.doc(FB.db, 'profiles', fbUser.uid);
+      const s = await FB.F.getDoc(ref);
+      if (s.exists() && s.data().name) {
+        const up = {}; if (s.data().lv !== lv) up.lv = lv; if (av && s.data().av !== av) up.av = av;
+        if (Object.keys(up).length) await FB.F.setDoc(ref, Object.assign(up, { t: FB.F.serverTimestamp() }), { merge: true });
+        try { localStorage.setItem(mark, sig); } catch (e) { /* 무시 */ }
+      }
+    } catch (e) { /* 다음 기회에 다시 */ }
+    pushing = false;
+  }
+  document.addEventListener('fb-ready', () => {
+    window.FB.A.onAuthStateChanged(window.FB.auth, (u) => { fbUser = u; if (u) setTimeout(syncLevel, 3000); });
+  });
+  S.onChange((type) => { if (type === 'sync') setTimeout(syncLevel, 1000); });
+  window.addEventListener('xp-profile', () => { try { localStorage.removeItem('xp.lvSynced.' + (fbUser && fbUser.uid)); } catch (e) { /* 무시 */ } syncLevel(); });
+
+  window.XP = { add, summary, levelOf, open: openPanel, syncLevel };
 })();

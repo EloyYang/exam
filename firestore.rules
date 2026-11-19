@@ -35,9 +35,11 @@ service cloud.firestore {
     match /profiles/{uid} {
       allow read: if true;
       allow create, update: if signed() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['name', 't', 'exam']) && request.resource.data.t == request.time
+        && request.resource.data.keys().hasOnly(['name', 't', 'exam', 'lv', 'av']) && request.resource.data.t == request.time
         && nickOk(request.resource.data.name)
         && (!('exam' in request.resource.data) || validExam(request.resource.data.exam))
+        && (!('lv' in request.resource.data) || (request.resource.data.lv is int && request.resource.data.lv >= 1 && request.resource.data.lv <= 999))
+        && (!('av' in request.resource.data) || (request.resource.data.av is string && request.resource.data.av.matches('^[a-z0-9.]{1,80}$')))
         && getAfter(/databases/$(database)/documents/nicknames/$(request.resource.data.name.lower())).data.uid == uid
         && (resource == null || resource.data.name.lower() == request.resource.data.name.lower()
             || !existsAfter(/databases/$(database)/documents/nicknames/$(resource.data.name.lower())));

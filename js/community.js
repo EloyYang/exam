@@ -49,7 +49,9 @@
   const dayLabel = (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${'일월화수목금토'[d.getDay()]}요일`;
   const isNew = (ts) => ts && ts.toDate && Date.now() - ts.toDate() < 864e5;
   function hue(s) { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
-  const avatar = (name, uid, cls = '') => `<span class="cm-av ${cls}" style="--h:${hue(uid || name)}" aria-hidden="true">${esc(String(name || '?').slice(0, 1))}</span>`;
+  // 캐릭터·레벨은 일단 글자·빈칸으로 그려 두고, fillProfiles() 가 profiles/{uid} 의 av·lv 로 채운다
+  const avatar = (name, uid, cls = '') => `<span class="cm-av ${cls}" data-avu="${uid || ''}" style="--h:${hue(uid || name)}" aria-hidden="true">${esc(String(name || '?').slice(0, 1))}</span>`;
+  const lvTag = (uid) => (uid ? `<span class="cm-lv" data-lvu="${uid}"></span>` : '');
   const catTag = (c) => `<span class="cm-cat" data-c="${esc(c)}">${esc(c)}</span>`;
   const box = (html) => `<div class="cm-card cm-center">${html}</div>`;
   const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -66,7 +68,7 @@
     if (!me) { el.innerHTML = '<div class="cm-me-txt">읽기는 누구나 할 수 있어요. 글쓰기·채팅·친구·스터디 그룹은 오른쪽 위 <b>Google 로그인</b> 뒤에 닉네임을 정하면 쓸 수 있어요.</div>'; return; }
     if (!profileLoaded) { el.innerHTML = '<div class="cm-me-txt">닉네임 확인 중…</div>'; return; }
     el.innerHTML = myName
-      ? `${avatar(myName, me.uid)}<div class="cm-me-txt"><b>${esc(myName)}</b><small>스터디 라운지 닉네임</small></div><button type="button" class="cm-btn ghost sm" data-act="nick">닉네임 변경</button>`
+      ? `${avatar(myName, me.uid)}<div class="cm-me-txt"><b>${esc(myName)} ${lvTag(me.uid)}</b><small>스터디 라운지 닉네임 · 캐릭터와 레벨이 글·채팅에 함께 보여요</small></div><a class="cm-btn ghost sm" href="character.html">🎨 캐릭터</a><button type="button" class="cm-btn ghost sm" data-act="nick">닉네임 변경</button>`
       : '<div class="cm-me-txt"><b>닉네임을 정해 주세요</b><small>글·댓글·채팅·친구 목록에는 닉네임만 보여요. 이메일·실명은 공개되지 않아요.</small></div><button type="button" class="cm-btn" data-act="nick">닉네임 정하기</button>';
   }
   function openNick() {
@@ -149,7 +151,7 @@
       default: return `<button type="button" class="cm-btn sm" data-act="friend-req" data-uid="${uid}" data-name="${esc(name)}">친구 신청</button>`;
     }
   }
-  const person = (uid, name, tags, actions) => `<li class="cm-person">${avatar(name, uid)}<span class="cm-pname"><b>${esc(name)}</b>${tags || ''}</span><span class="cm-pact">${actions || ''}</span></li>`;
+  const person = (uid, name, tags, actions) => `<li class="cm-person">${avatar(name, uid)}<span class="cm-pname"><b>${esc(name)}</b>${lvTag(uid)}${tags || ''}</span><span class="cm-pact">${actions || ''}</span></li>`;
   const examTag = (e) => (EXAMS[e] ? `<span class="cm-tag soft">${EXAMS[e]}</span>` : '');
   function badge(t, n) { const b = $(`.cm-tabs [data-tab="${t}"] .cm-badge`); if (b) { b.textContent = n || ''; b.hidden = !n; } }
 
@@ -218,7 +220,7 @@
     const row = (x) => `<li><a class="cm-row" href="${o.postHref}${x.id}">
       <span class="cm-row-cat">${catTag(x.cat)}</span>
       <span class="cm-row-title"><span class="cm-title-txt">${esc(x.title)}</span>${x.nc ? `<b class="cm-nc">[${x.nc}]</b>` : ''}${isNew(x.t) ? '<i class="cm-newb">N</i>' : ''}</span>
-      <span class="cm-row-name">${esc(x.name)}</span><span class="cm-row-time">${shortTime(x.t)}</span></a></li>`;
+      <span class="cm-row-name">${avatar(x.name, x.uid, 'xs')}${lvTag(x.uid)}<span class="cm-row-nick">${esc(x.name)}</span></span><span class="cm-row-time">${shortTime(x.t)}</span></a></li>`;
     const draw = () => {
       const r = c === '전체' ? rows : rows.filter((x) => x.cat === c);
       ul.innerHTML = r.length ? r.map(row).join('') : `<li class="cm-empty">${rows.length ? `'${esc(c)}' 말머리 글이 아직 없어요.` : o.empty}</li>`;
@@ -259,7 +261,7 @@
     el.innerHTML = `<article class="cm-card cm-post">
         <p class="cm-crumb">${esc(o.crumb)} › ${esc(x.cat)}</p>
         <h2 class="cm-post-title">${catTag(x.cat)} ${esc(x.title)}</h2>
-        <div class="cm-author">${avatar(x.name, x.uid)}<div><b>${esc(x.name)}</b><small>${fullTime(x.t)}</small></div><span class="cm-author-nc">댓글 <b class="cm-ncount">${x.nc || 0}</b></span></div>
+        <div class="cm-author">${avatar(x.name, x.uid, 'lg')}<div><b>${esc(x.name)} ${lvTag(x.uid)}</b><small>${fullTime(x.t)}</small></div><span class="cm-author-nc">댓글 <b class="cm-ncount">${x.nc || 0}</b></span></div>
         <div class="cm-body">${esc(x.body)}</div>
         <div class="cm-post-tools"><a class="cm-btn ghost sm" href="${o.back}">목록</a><span class="cm-grow"></span>
           ${me && x.uid !== me.uid ? `<button type="button" class="cm-txtbtn cm-report" data-path="${path}">신고</button>` : ''}
@@ -270,7 +272,7 @@
       const ul = $('.cm-comments', el); if (!ul) return;
       el.querySelectorAll('.cm-ncount').forEach((b) => { b.textContent = snap.size; });
       ul.innerHTML = snap.docs.map((d) => { const c = d.data(); return `<li>${avatar(c.name, c.uid, 'sm')}<div class="cm-cmt">
-          <div class="cm-cmt-head"><b>${esc(c.name)}</b>${c.uid === x.uid ? '<span class="cm-op">작성자</span>' : ''}</div>
+          <div class="cm-cmt-head"><b>${esc(c.name)}</b>${lvTag(c.uid)}${c.uid === x.uid ? '<span class="cm-op">작성자</span>' : ''}</div>
           <p>${esc(c.body)}</p>
           <div class="cm-cmt-foot"><span>${fullTime(c.t)}</span>${me && c.uid !== me.uid ? `<button type="button" class="cm-txtbtn cm-report" data-path="${d.ref.path}">신고</button>` : ''}${canDel(c) ? `<button type="button" class="cm-txtbtn cm-del" data-path="${d.ref.path}">삭제</button>` : ''}</div>
         </div></li>`; }).join('') || '<li class="cm-empty">아직 댓글이 없어요. 첫 댓글을 남겨 보세요.</li>';
@@ -295,7 +297,7 @@
       const del = canDel(x) ? `<button type="button" class="cm-msg-del cm-del" data-path="${d.ref.path}" title="지우기">×</button>` : '';
       out += `<div class="cm-msg${mine ? ' me' : ''}${first ? ' first' : ''}">
         ${mine ? '' : first ? avatar(x.name, x.uid) : '<span class="cm-av-gap"></span>'}
-        <div class="cm-msg-col">${!mine && first ? `<span class="cm-msg-name">${esc(x.name)}</span>` : ''}
+        <div class="cm-msg-col">${!mine && first ? `<span class="cm-msg-name">${esc(x.name)} ${lvTag(x.uid)}</span>` : ''}
           <div class="cm-msg-line"><p>${esc(x.text)}</p><span class="cm-msg-meta">${del}${last ? `<time>${clock(x.t)}</time>` : ''}</span></div>
         </div></div>`;
       prev = x;
@@ -485,6 +487,41 @@
     drawSocial();
   }
 
+  /* ── 캐릭터·레벨 채우기 ── */
+  const PROF = {}; // uid → { lv, av } | null (프로필 없음)
+  const pend = new Set(); let fetching = false;
+  const myProf = () => ({ lv: window.XP ? window.XP.summary().lv : null, av: window.AVATAR ? window.AVATAR.encode(window.AVATAR.load()) : null });
+  function fillProfiles() {
+    const root = $('#cm'); if (!root) return;
+    root.querySelectorAll('[data-avu]:not([data-f]), [data-lvu]:not([data-f])').forEach((el) => {
+      const u = el.dataset.avu || el.dataset.lvu; if (!u) { el.dataset.f = '1'; return; }
+      const p = me && u === me.uid ? myProf() : PROF[u];
+      if (p === undefined) { pend.add(u); return; }
+      el.dataset.f = '1';
+      if (!p) return;
+      if (el.dataset.avu && p.av && window.AVATAR) { el.innerHTML = window.AVATAR.svg(p.av, 64); el.classList.add('has-svg'); }
+      if (el.dataset.lvu && p.lv) { el.textContent = 'Lv.' + p.lv; el.dataset.tier = Math.min(5, Math.floor(p.lv / 10)); }
+    });
+    if (pend.size && !fetching && FB) fetchProfiles();
+  }
+  async function fetchProfiles() {
+    fetching = true;
+    const ids = [...pend]; pend.clear();
+    const { F } = FB;
+    for (let i = 0; i < ids.length; i += 10) {
+      const chunk = ids.slice(i, i + 10);
+      try {
+        const s = await F.getDocs(F.query(C('profiles'), F.where(F.documentId(), 'in', chunk)));
+        chunk.forEach((u) => { PROF[u] = null; });
+        s.forEach((d) => { const x = d.data(); PROF[d.id] = { lv: x.lv || null, av: x.av || null }; });
+      } catch (e) { chunk.forEach((u) => { PROF[u] = null; }); }
+    }
+    fetching = false;
+    fillProfiles();
+  }
+  // 화면이 다시 그려질 때마다(채팅 새 메시지 등) 캐시에서 바로 채운다
+  new MutationObserver(fillProfiles).observe($('#cm'), { childList: true, subtree: true });
+
   /* ── 버튼 동작 ── */
   const ACTS = {
     nick: () => openNick(),
@@ -628,7 +665,7 @@
       me = u ? { uid: u.uid } : null; isAdmin = false;
       if (u) isAdmin = await FB.F.getDoc(D('admins/' + u.uid)).then((s) => s.exists()).catch(() => false);
       watchProfile(); watchSocial(); renderMe();
-      render();
+      render(); fillProfiles();
     });
   });
 })();
