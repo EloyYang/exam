@@ -232,6 +232,7 @@
     S.set(K('q'), q);
     const res = { title: dr.title, keys, picks: dr.picks, correct, total: keys.length, date: today(), min: Math.round(dr.used / 60000) };
     S.set(K('last.' + curKind), res);
+    if (window.XP) window.XP.add({ n: keys.length, c: correct, kind: 'q' });
     S.set(K('log'), S.get(K('log'), []).concat([{ kind: curKind, title: dr.title, date: res.date, correct, total: res.total, score: Math.round((correct / res.total) * 1000) / 10, min: res.min }]).slice(-80));
     S.set(K('draft.' + curKind), null); location.hash = '#result';
   }

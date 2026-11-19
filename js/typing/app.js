@@ -242,6 +242,7 @@
   function save(it, ok) {
     const r = rec(); const x = r[it.id] || { t: 0, w: 0 };
     x.t++; if (!ok) x.w++; x.ok = ok; r[it.id] = x; S.set(K('rec'), r);
+    if (window.XP) window.XP.add({ n: 1, c: ok ? 1 : 0, kind: 't' });
   }
 
   // ── 입력 ──

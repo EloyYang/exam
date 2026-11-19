@@ -557,6 +557,7 @@
       const st = SETS[state.round];
       S.set(SETLOG_KEY, [{ id: state.round, title: st.title, kind: st.kind, items: st.items, date: today(), wrong: s.wrong, answers: state.answers, score: s.score, max: TOTAL(state.round), times: state.times, total: sum(state.times) }, ...setLog().filter((x) => x.id !== state.round)].slice(0, 30));
     } else window.ATTEMPTS.save({ round: state.round, date: today(), wrong: s.wrong, answers: state.answers, score: s.score, times: state.times, total: sum(state.times) });
+    { const qn = KEY[state.round].ans.length; if (window.XP) window.XP.add({ n: qn, c: qn - s.wrong.length, kind: 'q' }); }
     try { localStorage.removeItem(draftKey(state.round)); } catch (e) { /* 무시 */ }
     state.graded = true; state.showGrid = false; state.paused = false; state.onlyFlag = false;
     renderResult();

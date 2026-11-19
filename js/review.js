@@ -217,6 +217,7 @@
     const L = retryLog(); const o = L[id] || { ok: 0, no: 0 };
     if (ok) o.ok = (o.ok || 0) + 1; else o.no = (o.no || 0) + 1;
     o.last = ok ? 'ok' : 'no'; o.t = Date.now(); L[id] = o; window.UserStore.set(RKEY, L);
+    if (window.XP) window.XP.add({ n: 1, c: ok ? 1 : 0, kind: 'q' });
     if (rt.ids.length > 1) saveDraft();
     renderRetry(); document.querySelector('#rt .rt-res')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }

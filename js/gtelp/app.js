@@ -441,6 +441,7 @@
       const b = e.target.closest('button[data-o]'); if (!b || b.disabled) return;
       const q = b.closest('.gt-q'); const i = +q.dataset.k.slice(2); const x = G.items[i];
       const l = gLog(); l[q.dataset.k] = +b.dataset.o; S.set(K('grammar'), l);
+      if (window.XP) window.XP.add({ n: 1, c: +b.dataset.o === x[3] ? 1 : 0, kind: 'q' });
       const num = q.querySelector('.gt-qt b').textContent.replace('.', '');
       q.outerHTML = qHtml(q.dataset.k, num, `<span class="gt-tag">${TYPE[x[0]].name.split(' ')[0]}</span> ${blank(x[1])}`, x[2].map(esc), x[3], x[4], +b.dataset.o, true, gKo(x, q.dataset.k));
       refreshRt();
@@ -514,6 +515,7 @@
         if (n < openI.length && !confirm(`${openI.length - n}문항을 안 풀었어요. 채점할까요?`)) return;
         const ok = cur.qs.filter((q, i) => picks[i] === q[2]).length;
         const l = sLog(kind); l[cur.id] = { picks: cur.qs.map((q, i) => (picks[i] == null ? null : picks[i])), score: pct(ok, cur.qs.length), date: today() }; S.set(K(kind), l);
+        if (window.XP) window.XP.add({ n: openI.filter((i) => picks[i] != null).length, c: openI.filter((i) => picks[i] === cur.qs[i][2]).length, kind: 'q' });
         delete draftOf[cur.id]; delete retryOf[rk]; setPage(kind, id);
       });
       const rc = $('#s-rt-cancel'); if (rc) rc.addEventListener('click', () => { delete retryOf[rk]; setPage(kind, id); });
@@ -692,6 +694,7 @@
       root.querySelectorAll('[data-v]').forEach((b) => b.addEventListener('click', () => {
         const i = vq.ids[vq.k]; const j = +b.dataset.v; vq.picks[vq.k] = j;
         const l = vLog(); const w = V[i][0];
+        if (window.XP) window.XP.add({ n: 1, c: j === i ? 1 : 0, kind: 'v' });
         if (j === i) vq.ok++; else { l.miss[w] = (l.miss[w] || 0) + 1; l.known = l.known.filter((x) => x !== w); S.set(K('vocab'), l); }
         vocab();
       }));
@@ -802,6 +805,7 @@
       const miss = its.length - Object.keys(d.picks).length;
       if (!confirm(miss ? `${miss}문항을 안 풀었어요. 제출하고 채점할까요?` : '제출하고 채점할까요?')) return;
       save(); const sc = score(m, d.picks);
+      { const pk = Object.keys(d.picks).length; if (window.XP) window.XP.add({ n: pk, c: pk - sc.wrong.filter((w) => d.picks[w] != null).length, kind: 'q' }); }
       A.save({ round: M.indexOf(m) + 1, mock: m.id, title: m.title, score: sc.total, sec: sc.sec, picks: d.picks, wrong: sc.wrong, date: today(), time: Math.round(d.used / 60000) });
       S.set(K('mockDraft'), null); window.onbeforeunload = null; TTS.stop(); clearInterval(timer);
       location.hash = '#mock/res-' + m.id;
@@ -874,6 +878,7 @@
         const left = [...mRetry.open].filter((n) => mRetry.picks[n] == null).length;
         if (left && !confirm(`${left}문항을 안 풀었어요. 채점할까요?`)) return;
         const sc = score(m, mRetry.picks);
+        { const op = [...mRetry.open].filter((n) => mRetry.picks[n] != null); if (window.XP) window.XP.add({ n: op.length, c: op.filter((n) => !sc.wrong.includes(n)).length, kind: 'q' }); }
         A.save(Object.assign({}, r, { picks: mRetry.picks, sec: sc.sec, score: sc.total, wrong: sc.wrong }));
         mRetry = null; mockResult(id); window.scrollTo(0, 0);
       });

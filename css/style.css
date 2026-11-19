@@ -1703,3 +1703,42 @@ body.pw-on { overflow: hidden; }
 /* 개인정보처리방침·안내 글의 링크는 테마 색 (기본 파란색은 어두운 화면에서 안 보임) */
 .privacy a, .sub-plan a { color: var(--accent); }
 .privacy li { margin-bottom: 4px; }
+
+/* ── 경험치·레벨 (js/xp.js) ── */
+.xp-chip { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 800; }
+.xp-chip .xp-lv { color: var(--accent); }
+.xp-mini { display: inline-block; width: 34px; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.xp-mini i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.xp-home { cursor: pointer; margin-top: 4px; margin-bottom: 4px; }
+.xp-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.xp-home .xp-card:hover { border-color: var(--accent); }
+.xp-badge { flex: none; width: 54px; height: 54px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; font-size: 22px; font-weight: 900; color: #fff; background: linear-gradient(135deg, #d9822b, #b8452a); box-shadow: 0 3px 10px rgba(184, 69, 42, .3); }
+.xp-badge small { font-size: 10px; font-weight: 800; opacity: .85; margin-bottom: 2px; }
+.xp-main { flex: 1; min-width: 0; }
+.xp-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.xp-title { font-size: 15.5px; }
+.xp-num { font-size: 12.5px; color: var(--muted); font-weight: 700; white-space: nowrap; }
+.xp-bar { height: 10px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+.xp-bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #e3a33a, #d0603a); transition: width .6s ease; }
+.xp-sub { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+.xp-sub b { color: var(--accent); }
+.xp-dlg { width: min(92vw, 440px); border: 1px solid var(--line); border-radius: 12px; padding: 0; background: var(--surface); color: var(--text); box-shadow: 0 12px 40px rgba(0, 0, 0, .3); }
+.xp-dlg::backdrop { background: rgba(0, 0, 0, .45); }
+.xp-dlg-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.xp-dlg-head h2 { margin: 0; font-size: 17px; }
+.xp-x { border: 0; background: none; color: var(--muted); font-size: 24px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.xp-dlg-body { padding: 16px 18px 18px; }
+.xp-dlg-body .xp-card { border: 0; padding: 0; background: none; }
+.xp-dlg-body h3 { margin: 18px 0 8px; font-size: 14.5px; }
+.xp-next { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--surface-2); font-size: 13px; }
+.xp-how { list-style: none; margin: 0; padding: 0; font-size: 13.5px; }
+.xp-how li { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.xp-how li span { color: var(--muted); white-space: nowrap; }
+.xp-note { margin: 12px 0 0; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.xp-toast { position: fixed; left: 50%; bottom: 24px; z-index: 2000; transform: translate(-50%, 30px); opacity: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 18px; border-radius: 10px; background: #2b2620; color: #fff; box-shadow: 0 8px 24px rgba(0, 0, 0, .3); transition: opacity .25s, transform .25s; }
+.xp-toast b { font-size: 16px; color: #f5c46b; }
+.xp-toast span { font-size: 12px; opacity: .85; }
+.xp-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.xp-toast.up { background: linear-gradient(135deg, #d9822b, #b8452a); padding: 14px 24px; }
+.xp-toast.up b { color: #fff; font-size: 18px; }
+@media (max-width: 600px) { .xp-mini { display: none; } .xp-card { gap: 10px; padding: 12px; } .xp-badge { width: 46px; height: 46px; font-size: 19px; } .xp-how li { flex-direction: column; gap: 2px; } }
