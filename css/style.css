@@ -1709,7 +1709,7 @@ body.pw-on { overflow: hidden; }
 .xp-chip .xp-lv { color: var(--accent); }
 .xp-mini { display: inline-block; width: 34px; height: 5px; border-radius: 3px; background: var(--line); overflow: hidden; }
 .xp-mini i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
-.xp-home { cursor: pointer; margin-top: 4px; margin-bottom: 4px; }
+.xp-home { margin-top: 4px; margin-bottom: 0; padding-bottom: 0 !important; }
 .xp-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
 .xp-home .xp-card:hover { border-color: var(--accent); }
 .xp-badge { flex: none; width: 54px; height: 54px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; font-size: 22px; font-weight: 900; color: #fff; background: linear-gradient(135deg, #d9822b, #b8452a); box-shadow: 0 3px 10px rgba(184, 69, 42, .3); }
@@ -1927,3 +1927,20 @@ body.pw-on { overflow: hidden; }
   .g-quests li, .g-quests.compact li { grid-template-columns: 18px minmax(0, 1fr) 84px; }
   .g-notes { left: 12px; right: 12px; top: 60px; } .g-note { max-width: none; }
 }
+
+/* 처음 화면 간단 캐릭터 바 */
+.g-mini { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; }
+.g-mini:hover { border-color: var(--accent); }
+.g-mini-ava { flex: none; } .g-mini-ava .avatar-svg { width: 46px; height: 46px; border-radius: 12px; }
+.g-mini-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.g-mini-top { display: flex; align-items: baseline; gap: 6px; min-width: 0; font-size: 13.5px; }
+.g-mini-lv { flex: none; color: var(--accent); font-weight: 900; }
+.g-mini-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.g-mini-pow { flex: none; margin-left: auto; font-style: normal; font-size: 12px; font-weight: 800; color: var(--muted); }
+.g-mini .xp-bar { height: 6px; }
+.g-mini-tags { flex: none; display: flex; gap: 4px; }
+.g-mini-tag { padding: 2px 7px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); font-size: 12px; font-weight: 800; white-space: nowrap; }
+.g-mini-tag.ok { color: #34a04a; }
+.g-mini-tag.hot { background: #e5533d; border-color: #e5533d; color: #fff; }
+.g-mini-go { flex: none; font-size: 22px; line-height: 1; color: var(--muted); }
+@media (max-width: 600px) { .g-mini { gap: 9px; padding: 7px 10px; } .g-mini-pow { display: none; } .g-mini-ava .avatar-svg { width: 40px; height: 40px; } }

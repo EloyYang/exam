@@ -192,16 +192,17 @@
       <ul>${list.map((q) => `<li class="${q.got ? 'got' : ''}"><span class="g-q-chk">${q.got ? '✔' : ''}</span><span class="g-q-t">${esc(q.t)}<small>보상 🎁 +1 · ${q.xp} XP</small></span><span class="g-q-p"><i style="width:${Math.round((q.val / q.goal) * 100)}%"></i><em>${fmt(q.val)}/${fmt(q.goal)}</em></span></li>`).join('')}</ul>
       <p class="g-q-foot">3개 모두 끝내면 보너스 상자 · 7일 연속이면 출석 상자${n ? ` · <a href="${rel()}character.html#chest" class="g-chest-link">🎁 열지 않은 상자 ${n}개</a>` : ''}</p></div>`;
   }
+  // 처음 화면: 한 줄짜리 간단한 캐릭터 바. 누르면 캐릭터 화면에서 자세히 본다.
   function homeHTML(s) {
-    const cfg = AV.load(), n = chests();
-    return `<div class="g-home">
-      <a class="g-home-hero" href="${rel()}character.html">${AV.svg(cfg, 116)}<span class="g-home-lv">Lv.${s.lv}</span>${n ? `<span class="g-home-box">🎁 ${n}</span>` : ''}</a>
-      <div class="g-home-main">
-        <div class="xp-row"><b class="xp-title">${esc(s.title)}</b><span class="g-pow">⚔ 전투력 ${fmt(AV.power(cfg, s.lv))}</span></div>
-        <div class="xp-bar"><i style="width:${s.pct}%"></i></div>
-        <div class="xp-sub"><span>${fmt(s.cur)} / ${fmt(s.need)} XP · 오늘 <b>+${fmt(s.today)} XP</b></span><a href="${rel()}character.html">⚔ 장비·상자 →</a></div>
-        ${questHTML(true)}
-      </div></div>`;
+    const cfg = AV.load(), n = chests(), q = quests(), done = q.filter((x) => x.got).length;
+    return `<a class="g-mini" href="${rel()}character.html" title="내 캐릭터 · 장비 · 보물상자 · 퀘스트 자세히 보기">
+      <span class="g-mini-ava">${AV.svg(cfg, 46, 'face')}</span>
+      <span class="g-mini-main">
+        <span class="g-mini-top"><b class="g-mini-lv">Lv.${s.lv}</b><span class="g-mini-title">${esc(s.title)}</span><em class="g-mini-pow">⚔ ${fmt(AV.power(cfg, s.lv))}</em></span>
+        <span class="xp-bar"><i style="width:${s.pct}%"></i></span>
+      </span>
+      <span class="g-mini-tags"><span class="g-mini-tag${done === q.length ? ' ok' : ''}" title="오늘의 퀘스트">📜 ${done}/${q.length}</span>${n ? `<span class="g-mini-tag hot" title="열지 않은 보물상자">🎁 ${n}</span>` : ''}</span>
+      <span class="g-mini-go" aria-hidden="true">›</span></a>`;
   }
   let hooks = [];
   function redraw() { hooks.forEach((f) => { try { f(); } catch (e) { /* 무시 */ } }); if (window.XP && window.XP.redraw) window.XP.redraw(); }
