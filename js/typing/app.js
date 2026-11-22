@@ -1,5 +1,6 @@
 /*
  * 한국사 타자 연습
+ *   #gq  : 기출 문제(70~80회 실제 문항의 발문·자료)를 읽고 정답 핵심어(나라·왕·인물·사건)를 친다 — 데이터 js/typing/gq.js (extract/build_typing_gq.py 로 생성)
  *   #art : 유물 사진을 보고 시대(또는 유물 이름)를 친다 — 사진·설명은 notes.js ARTIFACTS, 시대는 js/typing/data.js TY_ART
  *   #ev  : 기출 문장('기출 문장 모아 보기'의 선택지 70~79회)을 보고 그때의 왕(대통령) 또는 나라·시대를 친다
  *          문장↔왕·나라 연결은 js/typing/kings.js (TY_SENT, tools/typing_kings.js 로 생성), 문장이 나온 문항은 ex-where.js
@@ -93,10 +94,23 @@
     return out;
   }
 
+  // 기출 문제: 실제 문항의 발문·자료를 보여 주고, 그 문제가 묻는 대상(정답 핵심어)을 친다
+  function gqItems(groups) {
+    const eras = E.groups.filter((x) => !groups.length || groups.includes(x[0])).flatMap((x) => x[2]);
+    const QE = window.QERA || {}; const wr = wrongSet();
+    return (window.TY_GQ || []).filter((x) => !groups.length || eras.includes(QE[x.id])).map((x) => {
+      const al = aliases(x.a);
+      return {
+        id: 'q:' + x.id, badge: qLabel(x.id), stem: x.st, prompt: x.b, answer: al[0], accepts: al, wrongQ: wr.has(x.id),
+        html: `<b>${esc(x.a)}</b> · ${qLabel(x.id)} ${E.names[QE[x.id]] ? `<span class="ty-meta">(${esc(E.names[QE[x.id]])})</span>` : ''}<br><span class="ty-meta">정답 선택지: ${esc(x.ok)}</span>${x.how ? `<br><span class="ty-meta">${x.how}</span>` : ''}${wr.has(x.id) ? '<br><span class="ty-meta"><em>기출 풀기에서 내가 틀린 문제예요</em></span>' : ''}`,
+      };
+    });
+  }
+
   // 지역사: 지역마다 단서 2개를 골라 보여 주고 지역 이름을 친다
   function regItems(groups) {
     const wr = wrongSet();
-    return (window.TY_REGION || []).filter((r) => !groups.length || groups.includes(r.abroad ? 'ab' : 'kr')).map((r) => {
+    return (window.TY_REGION || []).filter((r) => (r.src || []).length && (!groups.length || groups.includes(r.abroad ? 'ab' : 'kr'))).map((r) => { // 기출 문항(src)이 있는 지역만
       const al = [r.n].concat(r.acc || []);
       const two = rnd(r.c).slice(0, 2);
       const src = r.src || []; const mine = src.filter((id) => wr.has(id));
@@ -110,9 +124,9 @@
   }
 
   // ── 설정 ──
-  const TABS = [['art', '유물 사진 → 시대'], ['ev', '기출 문장 → 왕·나라'], ['reg', '지역사 → 지역']];
-  const tab = () => (location.hash === '#ev' ? 'ev' : location.hash === '#reg' ? 'reg' : 'art');
-  const OPT0 = { art: { target: 'era', mode: 'quiz', scope: 'all' }, ev: { groups: [], ans: 'king', mode: 'quiz', scopes: [] }, reg: { groups: [], mode: 'quiz', scopes: [] } };
+  const TABS = [['gq', '기출 문제 → 정답'], ['ev', '기출 문장 → 왕·나라'], ['art', '기출 유물 사진 → 시대'], ['reg', '기출 지역사 → 지역']];
+  const tab = () => { const h = location.hash.slice(1); return TABS.some(([t]) => t === h) ? h : 'gq'; };
+  const OPT0 = { gq: { groups: [], mode: 'quiz', scopes: [] }, art: { target: 'era', mode: 'quiz', scope: 'all' }, ev: { groups: [], ans: 'king', mode: 'quiz', scopes: [] }, reg: { groups: [], mode: 'quiz', scopes: [] } };
   const opt = () => {
     const o = Object.assign({}, OPT0[tab()], (S.get(K('opt'), {}) || {})[tab()]);
     if (tab() !== 'art') { // 시대·문제는 여러 개를 고를 수 있다 (비어 있으면 전체) — 예전 단일 값은 옮긴다
@@ -129,7 +143,7 @@
   let st = null; // { items, i, phase: 'type'|'retype'|'done', ok, wrong:[], keys, ms, t0, typed, back, hint }
   function newRound() {
     const o = opt(); const R0 = rec();
-    let items = tab() === 'art' ? artItems(o.target) : tab() === 'ev' ? evItems(o.groups, o.ans) : regItems(o.groups);
+    let items = tab() === 'gq' ? gqItems(o.groups) : tab() === 'art' ? artItems(o.target) : tab() === 'ev' ? evItems(o.groups, o.ans) : regItems(o.groups);
     if (tab() === 'art') { if (o.scope === 'wrong') items = items.filter((x) => R0[x.id] && R0[x.id].ok === false); }
     else if (o.scopes.length) items = items.filter((x) => (o.scopes.includes('wrong') && R0[x.id] && R0[x.id].ok === false) || (o.scopes.includes('ki') && x.wrongQ) || (o.scopes.includes('past') && x.past));
     st = { items: rnd(items).slice(0, ROUND), i: 0, phase: 'type', ok: 0, wrong: [], keys: 0, ms: 0, t0: 0, typed: 0, back: 0, hint: false, total: items.length };
@@ -159,8 +173,9 @@
       <div class="f-filters">
         ${tab() === 'reg' ? multi('groups', '지역', [['kr', '국내'], ['ab', '국외 동포 활동 지역']], o.groups) : ''}
         ${tab() === 'ev' ? multi('groups', '시대', E.groups.filter((g) => o.ans !== 'nation' || g[0] !== 'modern').map((g) => [g[0], g[1]]), o.groups) : ''}
+        ${tab() === 'gq' ? multi('groups', '시대', E.groups.map((g) => [g[0], g[1]]), o.groups) : ''}
         ${pick('mode', '방식', [['quiz', '맞히기'], ['copy', '보고 치기']], o.mode)}
-        ${tab() === 'reg' ? multi('scopes', '문제', [['past', '기출에 나온 지역'], ['wrong', '타자에서 틀린 것'], ['ki', '기출 오답']], o.scopes) : tab() === 'ev' ? multi('scopes', '문제', [['wrong', '타자에서 틀린 것'], ['ki', '기출 오답']], o.scopes) : pick('scope', '문제', [['all', '전체'], ['wrong', '타자에서 틀린 것']], o.scope)}
+        ${tab() === 'reg' ? multi('scopes', '문제', [['wrong', '타자에서 틀린 것'], ['ki', '기출 오답']], o.scopes) : tab() === 'ev' || tab() === 'gq' ? multi('scopes', '문제', [['wrong', '타자에서 틀린 것'], ['ki', '기출 오답']], o.scopes) : pick('scope', '문제', [['all', '전체'], ['wrong', '타자에서 틀린 것']], o.scope)}
       </div>
     </section>`;
     if (!st.items.length) {
@@ -178,9 +193,10 @@
     const side = (j) => { const x = st.items[j]; return x && x.img ? `<img src="${esc(x.img)}" alt="">` : ''; };
     const media = it.img
       ? `<div class="ty-media"><div class="ty-side">${side(st.i - 1)}</div><img class="ty-main" src="${esc(it.img)}" alt="문제 사진"><div class="ty-side">${side(st.i + 1)}</div></div>`
+      : it.stem != null ? `<div class="ty-event ty-gq"><span class="ty-badge">기출 ${esc(it.badge)}</span><p class="ty-stem">${esc(it.stem)}</p><p class="ty-src">${esc(it.prompt)}</p></div>`
       : `<div class="ty-event">${it.badge ? `<span class="ty-badge">${esc(it.badge)}</span>` : ''}<p>${esc(it.prompt)}</p></div>`;
     const q = it.img ? (tab() === 'art' && opt().target === 'era' ? `<p class="ty-q">${esc(it.prompt)} <small>· 어느 시대?</small></p>` : `<p class="ty-q"><small>${done ? esc(it.badge) + ' · ' : ''}이 유물의 이름은?</small></p>`)
-      : `<p class="ty-q"><small>${tab() === 'reg' ? '어느 지역의 이야기일까요?' : opt().ans === 'nation' ? '어느 나라(시대)의 일일까요?' : '이 일이 있었던 때의 왕(지도자)은?'}</small></p>`;
+      : `<p class="ty-q"><small>${tab() === 'gq' ? '이 문제가 묻는 (가)·밑줄 친 대상은? 정답 핵심어를 쳐 보세요' : tab() === 'reg' ? '어느 지역의 이야기일까요?' : opt().ans === 'nation' ? '어느 나라(시대)의 일일까요?' : '이 일이 있었던 때의 왕(지도자)은?'}</small></p>`;
     const msg = st.phase === 'retype' ? '<p class="ty-msg r">틀렸어요 — 정답을 한 번 따라 쳐 보세요</p>'
       : done ? `<p class="ty-msg ${st.lastOk ? 'g' : 'r'}">${st.lastOk ? '정답!' : '오답'} <span>${st.lastOk ? '' : `내 답: ${esc(st.lastIn || '(모름)')}`}</span></p>` : '';
     return `<section class="ty-stage">
@@ -242,7 +258,7 @@
   function save(it, ok) {
     const r = rec(); const x = r[it.id] || { t: 0, w: 0 };
     x.t++; if (!ok) x.w++; x.ok = ok; r[it.id] = x; S.set(K('rec'), r);
-    if (window.XP) window.XP.add({ n: 1, c: ok ? 1 : 0, kind: 't' });
+    if (window.XP) window.XP.add({ n: 1, c: ok ? 1 : 0, kind: String(it.id).startsWith('q:') ? 'q' : 't' }); // 기출 문제는 기출 풀기와 같은 경험치
   }
 
   // ── 입력 ──
