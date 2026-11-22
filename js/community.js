@@ -499,7 +499,7 @@
       if (p === undefined) { pend.add(u); return; }
       el.dataset.f = '1';
       if (!p) return;
-      if (el.dataset.avu && p.av && window.AVATAR) { el.innerHTML = window.AVATAR.svg(p.av, 64); el.classList.add('has-svg'); }
+      if (el.dataset.avu && p.av && window.AVATAR) { el.innerHTML = window.AVATAR.svg(p.av, 64, 'face'); el.classList.add('has-svg'); }
       if (el.dataset.lvu && p.lv) { el.textContent = 'Lv.' + p.lv; el.dataset.tier = Math.min(5, Math.floor(p.lv / 10)); }
     });
     if (pend.size && !fetching && FB) fetchProfiles();
@@ -635,17 +635,20 @@
       } else if (f.classList.contains('cm-post-form')) {
         const r = await F.addDoc(C(`${f.dataset.base}/posts`), { uid: me.uid, name, cat: f.cat.value, title: f.title.value.trim(), body: f.body.value.trim(), t: F.serverTimestamp(), nc: 0 });
         if (window.track) window.track('community_post', { exam, group: f.dataset.base.startsWith('groups/') });
+        if (window.GAME) window.GAME.bump('social');
         location.hash = f.dataset.postHref + r.id;
       } else if (f.classList.contains('cm-cform')) {
         const pref = D(f.dataset.post);
         await F.addDoc(F.collection(pref, 'comments'), { uid: me.uid, name, body: f.body.value.trim(), t: F.serverTimestamp() });
         await F.updateDoc(pref, { nc: F.increment(1) }).catch(() => {});
         f.reset();
+        if (window.GAME) window.GAME.bump('social');
       } else if (f.classList.contains('cm-chat-form')) {
         const text = f.text.value.trim(); if (!text) return;
         f.text.value = '';
         await F.addDoc(C(`${f.dataset.base}/chat`), { uid: me.uid, name, text, t: F.serverTimestamp() });
         if (window.track) window.track('community_chat', { exam, group: f.dataset.base.startsWith('groups/') });
+        if (window.GAME) window.GAME.bump('social');
       }
     } catch (err) { alert('처리하지 못했어요: ' + (err.code || err.message)); }
     finally { btn.disabled = false; if (f.classList.contains('cm-chat-form') && f.text) f.text.focus(); }

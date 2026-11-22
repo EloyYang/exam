@@ -83,18 +83,23 @@
   window.addEventListener('load', () => { if (!S.configured) ensureBase(); setTimeout(() => { if (!S.user) ensureBase(); }, 6000); });
 
   /* ── 경험치 더하기 ── */
+  // o: { n: 푼 문항 수, c: 맞힌 수, kind: 'q'|'v'|'t', src: 'retry'… } 또는 { bonus: 고정 XP (퀘스트 보상 등) }
   function add(o) {
-    const n = Math.max(0, (o && o.n) | 0); if (!n) return 0;
-    const c = Math.max(0, Math.min(n, (o.c | 0))), kind = (o && o.kind) || 'q';
-    const gain = pts(kind, n, c);
+    o = o || {};
+    const bonus = Math.max(0, o.bonus | 0);
+    const n = bonus ? 0 : Math.max(0, o.n | 0); if (!n && !bonus) return 0;
+    const c = Math.max(0, Math.min(n, (o.c | 0))), kind = o.kind || 'q';
+    const gain = bonus || pts(kind, n, c);
     const before = summary().lv;
     const d = data(), k = dev() + '|' + today(), e = d[k] || { x: 0, n: 0, c: 0 };
     e.x += gain; e.n += n; e.c += c; d[k] = e;
     S.set(KEY, d);
-    const s = summary();
-    toast(gain, s, s.lv > before, window.AVATAR && s.lv > before ? window.AVATAR.unlockedBetween(before, s.lv) : []);
+    const s = summary(), up = s.lv > before;
+    // 레벨업 연출·보상은 js/game.js 가 맡는다 (없으면 예전 알림)
+    if (!o.quiet) toast(gain, s, up && !window.GAME, window.AVATAR && up ? window.AVATAR.unlockedBetween(before, s.lv) : []);
     draw();
-    if (s.lv > before) { if (window.track) window.track('level_up', { level: s.lv }); syncLevel(); }
+    if (up) { if (!window.GAME && window.track) window.track('level_up', { level: s.lv }); syncLevel(); }
+    window.dispatchEvent(new CustomEvent('xp-gain', { detail: { gain, n, c, kind, src: o.src || '', before, after: s.lv } }));
     return gain;
   }
 
@@ -110,11 +115,12 @@
     }
     const s = summary();
     b.title = `${s.title} · 다음 레벨까지 ${fmt(s.need - s.cur)} XP`;
-    b.innerHTML = `<span class="xp-lv">Lv.${s.lv}</span><span class="xp-mini" aria-hidden="true"><i style="width:${s.pct}%"></i></span>`;
+    const box = window.GAME ? window.GAME.chests() : 0;
+    b.innerHTML = `<span class="xp-lv">Lv.${s.lv}</span><span class="xp-mini" aria-hidden="true"><i style="width:${s.pct}%"></i></span>${box ? `<span class="xp-box" title="열지 않은 보물상자">🎁${box}</span>` : ''}`;
   }
   function cardHTML(s, big) {
     return `<div class="xp-card${big ? ' big' : ''}">
-      ${window.AVATAR ? `<div class="xp-ava">${window.AVATAR.svg(window.AVATAR.load(), 64)}<span class="xp-ava-lv">Lv.${s.lv}</span></div>` : `<div class="xp-badge"><small>Lv</small>${s.lv}</div>`}
+      ${window.AVATAR ? `<div class="xp-ava">${window.AVATAR.svg(window.AVATAR.load(), 64, 'face')}<span class="xp-ava-lv">Lv.${s.lv}</span></div>` : `<div class="xp-badge"><small>Lv</small>${s.lv}</div>`}
       <div class="xp-main">
         <div class="xp-row"><b class="xp-title">${esc(s.title)}</b><span class="xp-num">${fmt(s.cur)} / ${fmt(s.need)} XP</span></div>
         <div class="xp-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${s.need}" aria-valuenow="${s.cur}"><i style="width:${s.pct}%"></i></div>
@@ -125,8 +131,11 @@
     if (!document.body.classList.contains('home-page')) return;
     const main = document.getElementById('home'); if (!main) return;
     let el = document.getElementById('xp-home');
-    if (!el) { el = document.createElement('section'); el.id = 'xp-home'; el.className = 'review xp-home'; main.parentNode.insertBefore(el, main); el.addEventListener('click', openPanel); }
-    el.innerHTML = cardHTML(summary(), true);
+    if (!el) {
+      el = document.createElement('section'); el.id = 'xp-home'; el.className = 'review xp-home'; main.parentNode.insertBefore(el, main);
+      el.addEventListener('click', (e) => { if (!window.GAME && !e.target.closest('a')) openPanel(); });
+    }
+    el.innerHTML = window.GAME ? window.GAME.homeHTML(summary()) : cardHTML(summary(), true);
   }
   function draw() { chip(); home(); const p = document.getElementById('xp-dlg'); if (p && p.open) fillPanel(p); }
 
@@ -134,7 +143,8 @@
     const s = summary();
     dlg.querySelector('.xp-dlg-body').innerHTML = `${cardHTML(s, true)}
       <p class="xp-next">다음 레벨까지 <b>${fmt(s.need - s.cur)} XP</b> · ${s.next ? `Lv.${s.next.lv}이 되면 <b>${esc(s.next.title)}</b> 칭호를 받아요` : '최고 칭호에 도달했어요! 🎉'}</p>
-      <a class="xp-deco" href="${/\/study\//.test(location.pathname) ? '../' : ''}character.html">🎨 캐릭터 꾸미기 <small>레벨이 오르면 새 아이템이 열려요</small></a>
+      ${window.GAME ? window.GAME.questHTML(true) : ''}
+      <a class="xp-deco" href="${/\/study\//.test(location.pathname) ? '../' : ''}character.html">⚔ 내 캐릭터 · 장비 · 보물상자${window.GAME && window.GAME.chests() ? ` <b class="xp-deco-n">🎁 ${window.GAME.chests()}</b>` : ''} <small>레벨업·퀘스트로 상자를 받고, 열어서 장비를 모아요</small></a>
       <h3>경험치 얻는 법</h3>
       <ul class="xp-how">
         <li><b>기출·모의고사·문항 세트 채점</b><span>문항마다 5 XP, 맞히면 +5 XP</span></li>
@@ -200,5 +210,5 @@
   S.onChange((type) => { if (type === 'sync') setTimeout(syncLevel, 1000); });
   window.addEventListener('xp-profile', () => { try { localStorage.removeItem('xp.lvSynced.' + (fbUser && fbUser.uid)); } catch (e) { /* 무시 */ } syncLevel(); });
 
-  window.XP = { add, summary, levelOf, open: openPanel, syncLevel };
+  window.XP = { add, summary, levelOf, open: openPanel, syncLevel, redraw: draw };
 })();
