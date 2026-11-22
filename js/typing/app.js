@@ -2,6 +2,7 @@
  * 한국사 타자 연습
  *   #gq  : 기출 문제(70~80회 실제 문항의 발문·자료)를 읽고 정답 핵심어(나라·왕·인물·사건)를 친다 — 데이터 js/typing/gq.js (extract/build_typing_gq.py 로 생성)
  *   #art : 유물 사진을 보고 시대(또는 유물 이름)를 친다 — 사진·설명은 notes.js ARTIFACTS, 시대는 js/typing/data.js TY_ART
+ *   #reg : 기출 지역사 문항(70~80회)의 발문·자료 원문을 보고 지역 이름을 친다 — js/typing/region.js (extract/build_typing_region.py 로 생성)
  *   #ev  : 기출 문장('기출 문장 모아 보기'의 선택지 70~79회)을 보고 그때의 왕(대통령) 또는 나라·시대를 친다
  *          문장↔왕·나라 연결은 js/typing/kings.js (TY_SENT, tools/typing_kings.js 로 생성), 문장이 나온 문항은 ex-where.js
  *          '기출 오답' 범위 = 기출 풀기에서 틀린 문항(khmap.quizLog·setLog, '외웠어요' 표시한 것 제외)에 나온 문장만
@@ -107,18 +108,15 @@
     });
   }
 
-  // 지역사: 지역마다 단서 2개를 골라 보여 주고 지역 이름을 친다
+  // 기출 지역사: 지역사 문항의 발문·자료 원문을 보여 주고 지역 이름을 친다 (데이터 js/typing/region.js)
   function regItems(groups) {
     const wr = wrongSet();
-    return (window.TY_REGION || []).filter((r) => (r.src || []).length && (!groups.length || groups.includes(r.abroad ? 'ab' : 'kr'))).map((r) => { // 기출 문항(src)이 있는 지역만
+    return (window.TY_REGION || []).filter((r) => !groups.length || groups.includes(r.abroad ? 'ab' : 'kr')).map((r) => {
       const al = [r.n].concat(r.acc || []);
-      const two = rnd(r.c).slice(0, 2);
-      const src = r.src || []; const mine = src.filter((id) => wr.has(id));
-      const rounds = [...new Set(src.map((id) => id.split('-')[0]))].sort((a, b) => b - a);
       return {
-        id: 'r:' + r.n, badge: rounds.length ? `기출 ${rounds.map((x) => x + '회').join(' ')}` : '', prompt: maskWith(two.join(' / '), al), answer: r.n, accepts: al,
-        wrongQ: mine.length > 0, past: src.length > 0,
-        html: `<b>${esc(r.n)}</b><ul class="ty-clues">${r.c.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>${src.length ? `<span class="ty-meta">기출 ${src.map(qLabel).join(', ')}${mine.length ? ` · <em>내가 틀린 문제 ${mine.map(qLabel).join(', ')}</em>` : ''}</span>` : '<span class="ty-meta">기출 지역사 문제에 나온 단서 말고 자주 나오는 지역을 보탰어요</span>'}`,
+        id: `r:${r.id}:${r.n}`, badge: qLabel(r.id), stem: r.st, prompt: r.b, slot: r.slot, answer: r.n, accepts: al,
+        wrongQ: wr.has(r.id), past: true,
+        html: `<b>${esc(r.n)}</b> · ${qLabel(r.id)}${r.ok ? `<br><span class="ty-meta">정답 선택지: ${esc(r.ok)}</span>` : ''}${wr.has(r.id) ? '<br><span class="ty-meta"><em>기출 풀기에서 내가 틀린 문제예요</em></span>' : ''}`,
       };
     });
   }
@@ -196,7 +194,7 @@
       : it.stem != null ? `<div class="ty-event ty-gq"><span class="ty-badge">기출 ${esc(it.badge)}</span><p class="ty-stem">${esc(it.stem)}</p><p class="ty-src">${esc(it.prompt)}</p></div>`
       : `<div class="ty-event">${it.badge ? `<span class="ty-badge">${esc(it.badge)}</span>` : ''}<p>${esc(it.prompt)}</p></div>`;
     const q = it.img ? (tab() === 'art' && opt().target === 'era' ? `<p class="ty-q">${esc(it.prompt)} <small>· 어느 시대?</small></p>` : `<p class="ty-q"><small>${done ? esc(it.badge) + ' · ' : ''}이 유물의 이름은?</small></p>`)
-      : `<p class="ty-q"><small>${tab() === 'gq' ? '이 문제가 묻는 (가)·밑줄 친 대상은? 정답 핵심어를 쳐 보세요' : tab() === 'reg' ? '어느 지역의 이야기일까요?' : opt().ans === 'nation' ? '어느 나라(시대)의 일일까요?' : '이 일이 있었던 때의 왕(지도자)은?'}</small></p>`;
+      : `<p class="ty-q"><small>${tab() === 'gq' ? '이 문제가 묻는 (가)·밑줄 친 대상은? 정답 핵심어를 쳐 보세요' : tab() === 'reg' ? `${esc(it.slot || '(가)')}은(는) 어느 지역일까요?` : opt().ans === 'nation' ? '어느 나라(시대)의 일일까요?' : '이 일이 있었던 때의 왕(지도자)은?'}</small></p>`;
     const msg = st.phase === 'retype' ? '<p class="ty-msg r">틀렸어요 — 정답을 한 번 따라 쳐 보세요</p>'
       : done ? `<p class="ty-msg ${st.lastOk ? 'g' : 'r'}">${st.lastOk ? '정답!' : '오답'} <span>${st.lastOk ? '' : `내 답: ${esc(st.lastIn || '(모름)')}`}</span></p>` : '';
     return `<section class="ty-stage">
@@ -258,7 +256,7 @@
   function save(it, ok) {
     const r = rec(); const x = r[it.id] || { t: 0, w: 0 };
     x.t++; if (!ok) x.w++; x.ok = ok; r[it.id] = x; S.set(K('rec'), r);
-    if (window.XP) window.XP.add({ n: 1, c: ok ? 1 : 0, kind: String(it.id).startsWith('q:') ? 'q' : 't' }); // 기출 문제는 기출 풀기와 같은 경험치
+    if (window.XP) window.XP.add({ n: 1, c: ok ? 1 : 0, kind: /^[qr]:/.test(String(it.id)) ? 'q' : 't' }); // 기출 문제·기출 지역사는 기출 풀기와 같은 경험치
   }
 
   // ── 입력 ──
