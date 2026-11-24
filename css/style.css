@@ -1948,5 +1948,7 @@ body.pw-on { overflow: hidden; }
 /* 타자 연습 · 기출 문제 → 정답 */
 .ty-event.ty-gq { max-width: 700px; text-align: left; }
 .ty-gq .ty-stem { font-size: 17px; font-weight: 800; }
+.ty-gq .ty-fig { position: relative; overflow: hidden; margin: 12px auto 0; border-radius: 8px; border: 1px solid var(--ty-line); background: #fff; }
+.ty-gq .ty-fig img { position: absolute; top: 0; left: 0; width: 100%; height: auto; display: block; }
 .ty-gq .ty-src { margin-top: 10px; padding: 12px 14px; border-radius: 8px; border: 1px dashed var(--ty-line); font-size: 15.5px; font-weight: 500; line-height: 1.75; max-height: 230px; overflow-y: auto; white-space: pre-wrap; }
 @media (max-width: 600px) { .ty-gq .ty-stem { font-size: 15.5px; } .ty-gq .ty-src { font-size: 14.5px; max-height: 200px; } }

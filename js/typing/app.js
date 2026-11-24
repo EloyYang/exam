@@ -95,6 +95,15 @@
     return out;
   }
 
+  // 기출 문제의 그림(우표·유물·지도 등): 문항 이미지에서 발문 아래 ~ ① 선지 위만 잘라 보여 준다 (데이터 js/typing/gqfig.js)
+  //   자료 글에 정답이 그대로 있어 ○○로 가린 문항은 그림에도 정답이 보이므로, 답을 낸 뒤에만 보여 준다
+  function figOf(x) {
+    const f = (window.TY_GQFIG || {})[x.id]; if (!f) return null;
+    const [r, n] = x.id.split('-');
+    return { src: `quiz/${r}/${String(n).padStart(2, '0')}.webp`, t: f[0], k: f[2], late: x.b.includes('○○') };
+  }
+  const figHtml = (f) => `<div class="ty-fig" style="aspect-ratio:1/${f.k};width:min(100%,${Math.round(360 / f.k)}px)"><img src="${esc(f.src)}" alt="문제 자료 그림" loading="lazy" style="transform:translateY(-${(f.t * 100).toFixed(2)}%)"></div>`;
+
   // 기출 문제: 실제 문항의 발문·자료를 보여 주고, 그 문제가 묻는 대상(정답 핵심어)을 친다
   function gqItems(groups) {
     const eras = E.groups.filter((x) => !groups.length || groups.includes(x[0])).flatMap((x) => x[2]);
@@ -102,7 +111,7 @@
     return (window.TY_GQ || []).filter((x) => !groups.length || eras.includes(QE[x.id])).map((x) => {
       const al = aliases(x.a);
       return {
-        id: 'q:' + x.id, badge: qLabel(x.id), stem: x.st, prompt: x.b, answer: al[0], accepts: al, wrongQ: wr.has(x.id),
+        id: 'q:' + x.id, badge: qLabel(x.id), stem: x.st, prompt: x.b, answer: al[0], accepts: al, wrongQ: wr.has(x.id), fig: figOf(x),
         html: `<b>${esc(x.a)}</b> · ${qLabel(x.id)} ${E.names[QE[x.id]] ? `<span class="ty-meta">(${esc(E.names[QE[x.id]])})</span>` : ''}<br><span class="ty-meta">정답 선택지: ${esc(x.ok)}</span>${x.how ? `<br><span class="ty-meta">${x.how}</span>` : ''}${wr.has(x.id) ? '<br><span class="ty-meta"><em>기출 풀기에서 내가 틀린 문제예요</em></span>' : ''}`,
       };
     });
@@ -191,7 +200,7 @@
     const side = (j) => { const x = st.items[j]; return x && x.img ? `<img src="${esc(x.img)}" alt="">` : ''; };
     const media = it.img
       ? `<div class="ty-media"><div class="ty-side">${side(st.i - 1)}</div><img class="ty-main" src="${esc(it.img)}" alt="문제 사진"><div class="ty-side">${side(st.i + 1)}</div></div>`
-      : it.stem != null ? `<div class="ty-event ty-gq"><span class="ty-badge">기출 ${esc(it.badge)}</span><p class="ty-stem">${esc(it.stem)}</p><p class="ty-src">${esc(it.prompt)}</p></div>`
+      : it.stem != null ? `<div class="ty-event ty-gq"><span class="ty-badge">기출 ${esc(it.badge)}</span><p class="ty-stem">${esc(it.stem)}</p><p class="ty-src">${esc(it.prompt)}</p>${it.fig && (done || !it.fig.late) ? figHtml(it.fig) : ''}</div>`
       : `<div class="ty-event">${it.badge ? `<span class="ty-badge">${esc(it.badge)}</span>` : ''}<p>${esc(it.prompt)}</p></div>`;
     const q = it.img ? (tab() === 'art' && opt().target === 'era' ? `<p class="ty-q">${esc(it.prompt)} <small>· 어느 시대?</small></p>` : `<p class="ty-q"><small>${done ? esc(it.badge) + ' · ' : ''}이 유물의 이름은?</small></p>`)
       : `<p class="ty-q"><small>${tab() === 'gq' ? '이 문제가 묻는 (가)·밑줄 친 대상은? 정답 핵심어를 쳐 보세요' : tab() === 'reg' ? `${esc(it.slot || '(가)')}은(는) 어느 지역일까요?` : opt().ans === 'nation' ? '어느 나라(시대)의 일일까요?' : '이 일이 있었던 때의 왕(지도자)은?'}</small></p>`;
